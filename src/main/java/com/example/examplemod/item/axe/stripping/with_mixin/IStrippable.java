@@ -3,8 +3,12 @@ package com.example.examplemod.item.axe.stripping.with_mixin;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * An interface for block.
+ * Custom strip recipe base on mixin
  * <p>A block implement this interface, the axe can make it stripped</p>
+ *
+ * <p>You should implement {@link com.example.examplemod.item.axe.stripping.with_mixin.IStrippable} to your block</p>
+ *
+ * @see com.example.examplemod.mixin.item.axe.stripping.MixinAxeItem
  */
 public interface IStrippable {
 

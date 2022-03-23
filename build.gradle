@@ -45,7 +45,7 @@ minecraft {
     // mappings channel: 'official', version: '1.18.1'
     mappings channel: 'parchment', version: '2022.03.06-1.18.1'
 
-    accessTransformer = file('src/main/resources/META-INF/examplemod_at_axe_stripping.cfg')
+    accessTransformer = file('src/main/resources/META-INF/examplemod_at.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.

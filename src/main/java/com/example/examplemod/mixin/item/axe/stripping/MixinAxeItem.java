@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AxeItem.class)
-public abstract class MixinAxeItemStripping {
+public abstract class MixinAxeItem {
 
     /**
      * Add to getAxeStrippingState method, check {@link IStrippable} interface.
