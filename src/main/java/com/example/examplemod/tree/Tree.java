@@ -53,7 +53,7 @@ public class Tree {
 
     @Nullable
     Tag.Named<Block> tagLogs;
-    TreeRegisterHelper register = new TreeRegisterHelper(this);
+    TreeRegister register = new TreeRegister(this);
     private final BuilderProperties properties;
 
     Tree(TreeBuilder builder, DeferredRegister<Block> blocks, DeferredRegister<Item> items) {
@@ -155,7 +155,7 @@ public class Tree {
         return Objects.requireNonNull(tagLogs);
     }
 
-    public TreeRegisterHelper register() {
+    public TreeRegister register() {
         return register;
     }
 

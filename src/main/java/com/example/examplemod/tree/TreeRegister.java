@@ -39,7 +39,7 @@ import java.util.function.Supplier;
  * * RegisterXxx methods means you must call in the mod, but addXxx is optional.
  */
 @SuppressWarnings("JavadocReference")
-public record TreeRegisterHelper(Tree tree) {
+public record TreeRegister(Tree tree) {
 
     /**
      * Register all block's render types, call in {@link FMLClientSetupEvent}
