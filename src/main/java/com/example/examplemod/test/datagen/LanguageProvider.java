@@ -3,6 +3,10 @@ package com.example.examplemod.test.datagen;
 import com.example.examplemod.datagen.LanguageProviderZhEn;
 import com.example.examplemod.test.ItemGroup;
 import com.example.examplemod.test.item.axe.stripping.StripTest;
+import com.example.examplemod.test.tree.TreeTest;
+import com.example.examplemod.test.woodwork.WoodworkTest;
+import com.example.examplemod.tree.TreeRegisterHelper;
+import com.example.examplemod.woodwork.with_mixin.WoodworkRegister;
 import net.minecraft.data.DataGenerator;
 
 public class LanguageProvider extends LanguageProviderZhEn {
@@ -24,5 +28,14 @@ public class LanguageProvider extends LanguageProviderZhEn {
     @Override
     protected void addTranslationsToProvider(boolean en, net.minecraftforge.common.data.LanguageProvider provider) {
         super.addTranslationsToProvider(en, provider);
+        TreeRegisterHelper tRegister = TreeTest.TREE.register();
+        tRegister.addLanguagesEn(this.en);
+        tRegister.addLanguagesZh(this.zh, "测试");
+        WoodworkRegister wRegisterM = WoodworkTest.TEST_MIXIN.register();
+        wRegisterM.addLanguagesEn(this.en);
+        wRegisterM.addLanguagesZh(this.zh, "测试MIXIN木");
+        com.example.examplemod.woodwork.with_at.WoodworkRegister wRegisterA = WoodworkTest.TEST_AT.register();
+        wRegisterA.addLanguagesEn(this.en);
+        wRegisterA.addLanguagesZh(this.zh, "测试AT木");
     }
 }

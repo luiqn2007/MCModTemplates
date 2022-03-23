@@ -55,6 +55,14 @@ public class Woodwork {
         return Objects.requireNonNull(BOAT_ENTITY_TYPE).get();
     }
 
+    public static WoodworkBuilder builder(ResourceLocation name) {
+        return new WoodworkBuilder(name);
+    }
+
+    public static WoodworkBuilder builder(String modid, String name) {
+        return new WoodworkBuilder(new ResourceLocation(modid, name));
+    }
+
     // properties
     public final MaterialColor plankColor;
     public final WoodType type;

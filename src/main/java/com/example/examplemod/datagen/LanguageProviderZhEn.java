@@ -18,7 +18,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public abstract class LanguageProviderZhEn implements DataProvider {
 
@@ -224,10 +223,7 @@ public abstract class LanguageProviderZhEn implements DataProvider {
     }
 
     protected void addTranslationsToProvider(boolean en, LanguageProvider provider) {
-        if (!added) {
-            addTranslations();
-            added = true;
-        }
+        addTranslations();
         (en ? enData : zhData).forEach(provider::add);
     }
 
@@ -244,7 +240,10 @@ public abstract class LanguageProviderZhEn implements DataProvider {
 
         @Override
         protected void addTranslations() {
-            LanguageProviderZhEn.this.addTranslationsToProvider(en, this);
+            if (!added) {
+                LanguageProviderZhEn.this.addTranslationsToProvider(en, this);
+                added = true;
+            }
         }
 
         @Override

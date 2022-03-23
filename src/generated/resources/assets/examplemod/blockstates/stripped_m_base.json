@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "examplemod:block/stripped_m_base"
+    }
+  }
+}

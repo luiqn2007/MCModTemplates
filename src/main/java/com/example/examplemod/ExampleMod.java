@@ -1,5 +1,8 @@
 package com.example.examplemod;
 
+import com.example.examplemod.test.item.axe.stripping.StripTest;
+import com.example.examplemod.test.tree.TreeTest;
+import com.example.examplemod.test.woodwork.WoodworkTest;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -18,14 +21,11 @@ public class ExampleMod {
 
     public static final String MOD_ID = "examplemod";
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
-    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITIES, MOD_ID);
-
     public ExampleMod() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        ITEMS.register(bus);
-        BLOCKS.register(bus);
-        ENTITIES.register(bus);
+
+        StripTest.register(bus);
+        TreeTest.register(bus);
+        WoodworkTest.register(bus);
     }
 }

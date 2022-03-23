@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "planks",
+  "ingredients": [
+    {
+      "item": "examplemod:test_tree_log"
+    }
+  ],
+  "result": {
+    "item": "minecraft:coal_ore",
+    "count": 4
+  }
+}
