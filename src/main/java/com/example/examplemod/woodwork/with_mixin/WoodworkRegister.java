@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -363,7 +363,7 @@ public record WoodworkRegister(Woodwork woodwork) {
      * @param tag tag appender creator, use {@link TagsProvider#tag}
      */
     @SuppressWarnings("JavadocReference")
-    public void addBlockTags(Function<Tag.Named<Block>, TagsProvider.TagAppender<Block>> tag) {
+    public void addBlockTags(Function<TagKey<Block>, TagsProvider.TagAppender<Block>> tag) {
         tag.apply(BlockTags.PLANKS).add(woodwork.planks());
         tag.apply(BlockTags.WOODEN_BUTTONS).add(woodwork.button());
         tag.apply(BlockTags.WOODEN_DOORS).add(woodwork.door());
@@ -388,7 +388,7 @@ public record WoodworkRegister(Woodwork woodwork) {
      * @param tag tag appender creator, use {@link TagsProvider#tag}
      */
     @SuppressWarnings("JavadocReference")
-    public void addItemTags(Function<Tag.Named<Item>, TagsProvider.TagAppender<Item>> tag) {
+    public void addItemTags(Function<TagKey<Item>, TagsProvider.TagAppender<Item>> tag) {
         tag.apply(ItemTags.BOATS).add(woodwork.boat());
     }
 

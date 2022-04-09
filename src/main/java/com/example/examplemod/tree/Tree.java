@@ -2,6 +2,7 @@ package com.example.examplemod.tree;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
@@ -52,7 +53,7 @@ public class Tree {
     private final Set<Item> allItems = new HashSet<>();
 
     @Nullable
-    Tag.Named<Block> tagLogs;
+    TagKey<Block> tagLogs;
     TreeRegister register = new TreeRegister(this);
     private final BuilderProperties properties;
 
@@ -151,7 +152,7 @@ public class Tree {
         return properties.name;
     }
 
-    public Tag<Block> tagLogs() {
+    public TagKey<Block> tagLogs() {
         return Objects.requireNonNull(tagLogs);
     }
 

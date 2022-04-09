@@ -1,0 +1,31 @@
+{
+  "feature": "examplemod:test_feature",
+  "placement": [
+    {
+      "height": {
+        "min_inclusive": {
+          "absolute": 0
+        },
+        "max_inclusive": {
+          "absolute": 5
+        },
+        "type": "minecraft:trapezoid"
+      },
+      "type": "minecraft:height_range"
+    },
+    {
+      "type": "minecraft:biome"
+    },
+    {
+      "predicate": {
+        "tag": "minecraft:stone_ore_replaceables",
+        "type": "minecraft:matching_block_tag"
+      },
+      "type": "minecraft:block_predicate_filter"
+    },
+    {
+      "count": 10,
+      "type": "minecraft:count"
+    }
+  ]
+}

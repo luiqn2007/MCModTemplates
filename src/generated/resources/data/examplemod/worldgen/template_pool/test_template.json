@@ -1,0 +1,15 @@
+{
+  "name": "examplemod:test_template",
+  "fallback": "examplemod:test_template",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "minecraft:test_element",
+        "processors": "examplemod:test_processor_list",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

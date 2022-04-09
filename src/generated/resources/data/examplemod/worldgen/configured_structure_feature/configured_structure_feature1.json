@@ -1,0 +1,25 @@
+{
+  "config": {},
+  "biomes": "examplemod:test_biome",
+  "adapt_noise": true,
+  "spawn_overrides": {
+    "creature": {
+      "bounding_box": "piece",
+      "spawns": [
+        {
+          "type": "minecraft:cat",
+          "weight": 1,
+          "minCount": 3,
+          "maxCount": 5
+        },
+        {
+          "type": "minecraft:cow",
+          "weight": 2,
+          "minCount": 4,
+          "maxCount": 6
+        }
+      ]
+    }
+  },
+  "type": "minecraft:endcity"
+}

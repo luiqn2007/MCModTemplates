@@ -1,0 +1,9 @@
+{
+  "config": {
+    "start_pool": "examplemod:test_template",
+    "size": 5
+  },
+  "biomes": "examplemod:another_biome",
+  "spawn_overrides": {},
+  "type": "minecraft:village"
+}

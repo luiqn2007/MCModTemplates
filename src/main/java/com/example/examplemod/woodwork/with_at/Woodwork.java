@@ -24,13 +24,10 @@ import java.util.function.Supplier;
  * Woodwork, from planks to sign, trapdoor, button, fence, door, and other all vanilla wooden blocks and item(boat),
  * based on at
  *
- * <p>In this version, because of </p>
+ * <p>In this version, your boat layer texture is in resources/assets/minecraft/ </p>
  *
  * <li>{@code public-f net.minecraft.world.level.block.entity.BlockEntityType f_58915_ # validBlocks}</li>
  * <li>{@code public net.minecraft.data.recipes.RecipeProvider m_176580_(Ljava/util/function/Consumer;Lnet/minecraft/data/BlockFamily;)V # generateRecipes}</li>
- * <li>{@code public net.minecraft.data.tags.TagsProvider m_126548_(Lnet/minecraft/tags/Tag$Named;)Lnet/minecraft/data/tags/TagsProvider$TagAppender; # tag}</li>
- * <li>{@code public net.minecraft.world.entity.vehicle.Boat f_38279_ # status}</li>
- * <li>{@code public net.minecraft.world.entity.vehicle.Boat f_38281_ # lastYd}</li>
  */
 public class Woodwork {
 

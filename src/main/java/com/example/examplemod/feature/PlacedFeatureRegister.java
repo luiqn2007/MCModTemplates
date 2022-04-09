@@ -1,5 +1,6 @@
 package com.example.examplemod.feature;
 
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
@@ -53,10 +54,10 @@ public class PlacedFeatureRegister {
         BiomeSpecialEffects effects = event.getEffects();
         features.stream()
                 .filter(e -> e.test(name, category, climate, effects))
-                .forEach(e -> generation.addFeature(e.decoration.ordinal(), e));
+                .forEach(e -> generation.addFeature(e.decoration.ordinal(), e.get()));
     }
 
-    public static final class Entry<C extends FeatureConfiguration, B extends BaseFeatureBuilder<C, B>> implements Supplier<PlacedFeature> {
+    public static final class Entry<C extends FeatureConfiguration, B extends BaseFeatureBuilder<C, B>> implements Supplier<Holder<PlacedFeature>> {
         private final Supplier<B> supplier;
         private final Filter filter;
         private final ResourceLocation name;
@@ -78,7 +79,7 @@ public class PlacedFeatureRegister {
         }
 
         @Override
-        public PlacedFeature get() {
+        public Holder<PlacedFeature> get() {
             return getBuilder().build(name);
         }
 

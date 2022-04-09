@@ -16,7 +16,7 @@ public class BlockTagProvider extends BlockTagsProvider {
     @Override
     protected void addTags() {
         TreeTest.TREE.register().addBlockTags(this::tag);
-        WoodworkTest.TEST_AT.register().addBlockTags(this);
+        WoodworkTest.TEST_AT.register().addBlockTags(this::tag);
         WoodworkTest.TEST_MIXIN.register().addBlockTags(this::tag);
     }
 }

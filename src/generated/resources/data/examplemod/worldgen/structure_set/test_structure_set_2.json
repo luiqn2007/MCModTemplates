@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "examplemod:configured_structure_feature2",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "distance": 1,
+    "spread": 2,
+    "count": 3,
+    "type": "minecraft:concentric_rings"
+  }
+}

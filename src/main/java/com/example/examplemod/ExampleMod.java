@@ -1,5 +1,6 @@
 package com.example.examplemod;
 
+import com.example.examplemod.test.command.CommandTest;
 import com.example.examplemod.test.item.axe.stripping.StripTest;
 import com.example.examplemod.test.tree.TreeTest;
 import com.example.examplemod.test.woodwork.WoodworkTest;
@@ -24,6 +25,7 @@ public class ExampleMod {
     public ExampleMod() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        CommandTest.REGISTER.register();
         StripTest.register(bus);
         TreeTest.register(bus);
         WoodworkTest.register(bus);

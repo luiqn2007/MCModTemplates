@@ -3,177 +3,107 @@ package com.example.examplemod.datagen;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
+import com.mojang.serialization.Lifecycle;
+import net.minecraft.core.*;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
 import net.minecraft.data.info.WorldgenRegistryDumpReport;
-import net.minecraft.resources.RegistryWriteOps;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.CubicSpline;
-import net.minecraft.util.ToFloatFunction;
-import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.FixedBiomeSource;
-import net.minecraft.world.level.biome.TerrainShaper;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.util.valueproviders.ConstantFloat;
+import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.carver.CaveCarverConfiguration;
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+import net.minecraft.world.level.levelgen.carver.WorldCarver;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static net.minecraft.world.level.levelgen.SurfaceRules.ifTrue;
+import static net.minecraft.world.level.levelgen.SurfaceRules.verticalGradient;
+
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class WorldGenProvider implements DataProvider {
 
     private final Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
     private final Logger logger = LogManager.getLogger();
 
-    private final RegistryAccess registryAccess = RegistryAccess.builtin();
-    private final DynamicOps<JsonElement> ops = RegistryWriteOps.create(JsonOps.INSTANCE, registryAccess);
-    private final Map<Class<? extends BiomeSource>, BiFunction<BiomeSource, JsonElement, JsonElement>> biomeFixers = new HashMap<>();
+    protected final RegistryAccess registryAccess;
+    protected final DynamicOps<JsonElement> ops;
     private final boolean dump;
 
     private final DataGenerator generator;
     private final String modid;
 
-    private final DimensionType dummyType = DimensionType.create(OptionalLong.empty(), false, false,
-            false, false, 1, false, false,
-            false, false, false, 0, 16, 16,
-            BlockTags.INFINIBURN_OVERWORLD.getName(), DimensionType.OVERWORLD_EFFECTS, 0);
-    private final NoiseGeneratorSettings dummyNoiseSettings = new NoiseGeneratorSettings(new StructureSettings(false),
-            new NoiseSettings(0, 0, new NoiseSamplingSettings(1, 1, 1, 1),
-                    new NoiseSlider(0, 0, 0),
-                    new NoiseSlider(0, 0, 0),
-                    1, 1, false, false, false,
-                    TerrainShaper.overworld(false)),
-            Blocks.AIR.defaultBlockState(), Blocks.AIR.defaultBlockState(),
-            sequence().ifAbovePreliminarySurface(SurfaceRules.state(Blocks.STONE.defaultBlockState())).build(),
-            0, false, false, false, false, false, false);
+    protected final MappedRegistry<LevelStem> dimensions;
+    protected final MappedRegistry<DimensionType> dimensionTypes;
+    protected final MappedRegistry<Biome> biomes;
+    protected final MappedRegistry<ConfiguredWorldCarver<?>> configuredCarvers;
+    protected final MappedRegistry<ConfiguredFeature<?, ?>> configuredFeatures;
+    protected final MappedRegistry<ConfiguredStructureFeature<?, ?>> configuredStructureFeatures;
+    protected final MappedRegistry<DensityFunction> densityFunctions;
+    protected final MappedRegistry<NormalNoise.NoiseParameters> noiseParameters;
+    protected final MappedRegistry<NoiseGeneratorSettings> noiseGeneratorSettings;
+    protected final MappedRegistry<PlacedFeature> placedFeatures;
+    protected final MappedRegistry<StructureProcessorList> processorLists;
+    protected final MappedRegistry<StructureSet> structureSets;
+    protected final MappedRegistry<StructureTemplatePool> templatePools;
+
+    protected final Map<ResourceKey<Registry<?>>, Map<ResourceLocation, Object>> objects = new HashMap<>();
 
     public WorldGenProvider(DataGenerator generator, String modid, boolean dump) {
         this.generator = generator;
         this.modid = modid;
         this.dump = dump;
 
-        addBiomeSourceFixer(FixedBiomeSource.class, (bs, json) -> {
-            JsonObject object = json.getAsJsonObject();
-            JsonObject bsJson = object.getAsJsonObject("generator").getAsJsonObject("biome_source");
-            JsonElement biome = bsJson.get("biome");
-            if (biome.isJsonObject()) {
-                bsJson.remove("biome");
-                bsJson.add("biome", biome.getAsJsonObject().get("forge:registry_name"));
-            }
-            return json;
-        });
+        this.registryAccess = RegistryAccess.builtinCopy();
+        this.dimensionTypes = (MappedRegistry<DimensionType>) registryAccess.ownedRegistryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+        this.biomes = (MappedRegistry<Biome>) registryAccess.ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
+        this.configuredCarvers = (MappedRegistry<ConfiguredWorldCarver<?>>) registryAccess.ownedRegistryOrThrow(Registry.CONFIGURED_CARVER_REGISTRY);
+        this.configuredFeatures = (MappedRegistry<ConfiguredFeature<?, ?>>) registryAccess.ownedRegistryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
+        this.configuredStructureFeatures = (MappedRegistry<ConfiguredStructureFeature<?, ?>>) registryAccess.ownedRegistryOrThrow(Registry.CONFIGURED_STRUCTURE_FEATURE_REGISTRY);
+        this.densityFunctions = (MappedRegistry<DensityFunction>) registryAccess.ownedRegistryOrThrow(Registry.DENSITY_FUNCTION_REGISTRY);
+        this.noiseParameters = (MappedRegistry<NormalNoise.NoiseParameters>) registryAccess.ownedRegistryOrThrow(Registry.NOISE_REGISTRY);
+        this.noiseGeneratorSettings = (MappedRegistry<NoiseGeneratorSettings>) registryAccess.ownedRegistryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+        this.placedFeatures = (MappedRegistry<PlacedFeature>) registryAccess.ownedRegistryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
+        this.processorLists = (MappedRegistry<StructureProcessorList>) registryAccess.ownedRegistryOrThrow(Registry.PROCESSOR_LIST_REGISTRY);
+        this.structureSets = (MappedRegistry<StructureSet>) registryAccess.ownedRegistryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
+        this.templatePools = (MappedRegistry<StructureTemplatePool>) registryAccess.ownedRegistryOrThrow(Registry.TEMPLATE_POOL_REGISTRY);
+        this.dimensions = (MappedRegistry<LevelStem>) DimensionType.defaultDimensions(registryAccess, 0);
+
+        this.ops = RegistryOps.create(JsonOps.INSTANCE, registryAccess);
     }
 
-    public abstract void addDimensionTypes(Map<ResourceLocation, Type> register);
-
-    public abstract void addLevelStems(Map<ResourceLocation, Stem> register);
-
-    public abstract void addNoiseSettings(Map<ResourceLocation, NoiseGeneratorSettings> register);
-
-    public <T extends BiomeSource> void addBiomeSourceFixer(Class<T> type, BiFunction<BiomeSource, JsonElement, JsonElement> fixer) {
-        biomeFixers.put(type, fixer);
-    }
-
-    public NoiseSamplingSettings samplingSettings(double xzScale, double yScale, double xzFactor, double yFactor) {
-        return new NoiseSamplingSettings(xzScale, yScale, xzFactor, yFactor);
-    }
-
-    public NoiseSlider noiseSlider(double target, int size, int offset) {
-        return new NoiseSlider(target, size, offset);
-    }
-
-    static TerrainShaper terrainShaper(CubicSpline<TerrainShaper.Point> offsetSampler,
-                                       CubicSpline<TerrainShaper.Point> factorSampler,
-                                       CubicSpline<TerrainShaper.Point> jaggednessSampler) {
-        return new TerrainShaper(offsetSampler, factorSampler, jaggednessSampler);
-    }
-
-    static <C> CubicSpline<C> cubicSpline(float value) {
-        return CubicSpline.constant(value);
-    }
-
-    static <C> NamedCubicSplineBuilder<C> cubicSpline(ToFloatFunction<C> coordinate) {
-        return new NamedCubicSplineBuilder<>(CubicSpline.builder(coordinate));
-    }
-
-    static <C> NamedCubicSplineBuilder<C> cubicSpline(ToFloatFunction<C> coordinate, ToFloatFunction<Float> valueTransformer) {
-        return new NamedCubicSplineBuilder<>(CubicSpline.builder(coordinate, valueTransformer));
-    }
-
-    public NoiseBasedChunkGenerator noiseGenerator(BiomeSource biomeSource, long seed, NoiseGeneratorSettings settings) {
-        return new NoiseBasedChunkGenerator(registryAccess.registryOrThrow(Registry.NOISE_REGISTRY), biomeSource, seed, () -> settings);
-    }
-
-    public NoiseBasedChunkGenerator noiseGenerator(BiomeSource biomeSource, long seed, ResourceLocation settings) {
-        return new NoiseBasedChunkGenerator2(registryAccess.registryOrThrow(Registry.NOISE_REGISTRY), biomeSource, seed, settings);
-    }
-
-    public NoiseBasedChunkGenerator noiseGenerator(BiomeSource biomeSource, NoiseGeneratorSettings settings) {
-        return noiseGenerator(biomeSource, 0, settings);
-    }
-
-    public NoiseBasedChunkGenerator noiseGenerator(BiomeSource biomeSource, ResourceLocation settings) {
-        return noiseGenerator(biomeSource, 0, settings);
-    }
-
-    public NoiseGeneratorSettings generatorSettings(StructureSettings structureSettings,
-                                                    NoiseSettings noiseSettings,
-                                                    BlockState defaultBlock,
-                                                    BlockState defaultFluid,
-                                                    SurfaceRules.RuleSource surfaceRule,
-                                                    int seaLevel,
-                                                    boolean disableMobGeneration,
-                                                    boolean aquifersEnabled,
-                                                    boolean noiseCavesEnabled,
-                                                    boolean oreVeinsEnabled,
-                                                    boolean noodleCavesEnabled,
-                                                    boolean isLegacyAlgorithm) {
-        return new NoiseGeneratorSettings(structureSettings, noiseSettings, defaultBlock, defaultFluid, surfaceRule,
-                seaLevel, disableMobGeneration, aquifersEnabled, noiseCavesEnabled, oreVeinsEnabled,
-                noodleCavesEnabled, isLegacyAlgorithm);
-    }
-
-    public SurfaceRules.RuleSource ifTrue(SurfaceRules.ConditionSource ifTrue, SurfaceRules.RuleSource thenRun) {
-        return SurfaceRules.ifTrue(ifTrue, thenRun);
-    }
-
-    public SurfaceRules.RuleSource block(Block state) {
-        return SurfaceRules.state(state.defaultBlockState());
-    }
-
-    public SurfaceRules.RuleSource block(Supplier<? extends Block> state) {
-        return SurfaceRules.state(state.get().defaultBlockState());
-    }
-
-    public RuleSourceSequence sequence() {
-        return new RuleSourceSequence();
-    }
-
-    public SurfaceRules.ConditionSource verticalGradient(String randomName, VerticalAnchor trueAtAndBelow, VerticalAnchor falseAtAndAbove) {
-        return SurfaceRules.verticalGradient(randomName, trueAtAndBelow, falseAtAndAbove);
-    }
+    protected abstract void addAll();
 
     @Override
     public void run(HashCache cache) {
@@ -182,57 +112,37 @@ public abstract class WorldGenProvider implements DataProvider {
         }
 
         Path path = generator.getOutputFolder();
-        // dimension types
-        Map<ResourceLocation, Type> types = new HashMap<>();
-        addDimensionTypes(types);
-        save(path, cache, Registry.DIMENSION_TYPE_REGISTRY, types, Type::type, DimensionType.DIRECT_CODEC, (type, json) -> {
-            if (type.name != null) {
-                JsonObject obj = json.getAsJsonObject();
-                obj.addProperty("name", type.name);
-            }
-            return json;
-        });
-        // noise settings
-        Map<ResourceLocation, NoiseGeneratorSettings> settings = new HashMap<>();
-        addNoiseSettings(settings);
-        save(path, cache, Registry.NOISE_GENERATOR_SETTINGS_REGISTRY, settings, Function.identity(), NoiseGeneratorSettings.DIRECT_CODEC, (_1, _2, json) -> json);
-        // stems
-        Map<ResourceLocation, Stem> stems = new HashMap<>();
-        addLevelStems(stems);
-        save(path, cache, Registry.LEVEL_STEM_REGISTRY, stems, stem -> new LevelStem(() -> dummyType, stem.generator, stem.useServerSeed), LevelStem.CODEC, (stem, levelStem, json) -> {
-            JsonObject object = json.getAsJsonObject();
-            object.addProperty("type", stem.dimension.toString());
-            BiomeSource bs = levelStem.generator().getBiomeSource();
-            BiFunction<BiomeSource, JsonElement, JsonElement> fixer = biomeFixers.get(bs.getClass());
-            if (fixer != null) {
-                json = fixer.apply(bs, json);
-            }
-            if (stem.generator instanceof NoiseBasedChunkGenerator2 noiseGenerator) {
-                object.getAsJsonObject("generator").remove("settings");
-                object.getAsJsonObject("generator").addProperty("settings", noiseGenerator.settings.toString());
-            }
-            return json;
-        });
+        addAll();
+
+        save(path, cache, dimensions, LevelStem.CODEC);
+        save(path, cache, dimensionTypes, DimensionType.DIRECT_CODEC);
+        save(path, cache, biomes, Biome.DIRECT_CODEC);
+        save(path, cache, configuredCarvers, ConfiguredWorldCarver.DIRECT_CODEC);
+        save(path, cache, configuredFeatures, ConfiguredFeature.DIRECT_CODEC);
+        save(path, cache, configuredStructureFeatures, ConfiguredStructureFeature.DIRECT_CODEC);
+        save(path, cache, densityFunctions, DensityFunction.DIRECT_CODEC);
+        save(path, cache, noiseParameters, NormalNoise.NoiseParameters.DIRECT_CODEC);
+        save(path, cache, noiseGeneratorSettings, NoiseGeneratorSettings.DIRECT_CODEC);
+        save(path, cache, placedFeatures, PlacedFeature.DIRECT_CODEC);
+        save(path, cache, processorLists, StructureProcessorType.DIRECT_CODEC);
+        save(path, cache, structureSets, StructureSet.DIRECT_CODEC);
+        save(path, cache, templatePools, StructureTemplatePool.DIRECT_CODEC);
     }
 
-    private <T, RT> void save(Path path, HashCache cache, ResourceKey<?> key, Map<ResourceLocation, T> register,
-                              Function<T, RT> map, Codec<RT> codec, Function3<T, RT, JsonElement, JsonElement> fixer) {
+    private <T> void save(Path path, HashCache cache, Registry<T> register, Codec<T> codec) {
+        ResourceKey<? extends Registry<T>> key = register.key();
         Path target = path.resolve("data").resolve(modid).resolve(key.location().getPath());
-        register.forEach((name, value) -> {
-            RT rt = map.apply(value);
-            JsonElement json = codec.encodeStart(ops, rt)
-                    .getOrThrow(false, s -> {
-                        throw new RuntimeException("Couldn't serialize element " + name + ": " + s);
-                    });
-            json = fixer.apply(value, rt, json);
-            Path output = target.resolve(name.getPath() + ".json");
-            save(cache, json, output);
-        });
-    }
-
-    private <T, RT> void save(Path path, HashCache cache, ResourceKey<?> key, Map<ResourceLocation, T> register,
-                              Function<T, RT> map, Codec<RT> codec, BiFunction<T, JsonElement, JsonElement> fixer) {
-        save(path, cache, key, register, map, codec, (v, rv, json) -> fixer.apply(v, json));
+        Map<ResourceLocation, T> values = (Map<ResourceLocation, T>) objects.get(key);
+        if (values != null && !values.isEmpty()) {
+            values.forEach((name, value) -> {
+                JsonElement json = codec.encodeStart(ops, value)
+                        .getOrThrow(false, s -> {
+                            throw new RuntimeException("Couldn't serialize element " + name + ": " + s);
+                        });
+                Path output = target.resolve(name.getPath() + ".json");
+                save(cache, json, output);
+            });
+        }
     }
 
     private void save(HashCache cache, JsonElement element, Path path) {
@@ -243,43 +153,202 @@ public abstract class WorldGenProvider implements DataProvider {
         }
     }
 
+    protected void addDimension(ResourceLocation name, LevelStem stem) {
+        add(name, stem, dimensions);
+    }
+
+    protected ResourceLocation addDimensionType(ResourceLocation name, DimensionType type) {
+        return add(name, type, dimensionTypes);
+    }
+
+    protected Holder<DimensionType> getDimensionType(ResourceLocation name) {
+        return get(name, () -> DimensionType.create(OptionalLong.empty(), false, false, false,
+                false, 1, false, false, false,
+                false, false, 0, 16, 16,
+                BlockTags.INFINIBURN_OVERWORLD, DimensionType.OVERWORLD_EFFECTS, 1), dimensionTypes);
+    }
+
+    protected ResourceLocation addBiome(ResourceLocation name, Biome biome) {
+        return add(name, biome, biomes);
+    }
+
+    protected Holder<Biome> getBiome(ResourceLocation name) {
+        return get(name, () -> new Biome.BiomeBuilder()
+                .precipitation(Biome.Precipitation.NONE)
+                .biomeCategory(Biome.BiomeCategory.DESERT)
+                .temperature(100)
+                .temperatureAdjustment(Biome.TemperatureModifier.NONE)
+                .downfall(1)
+                .specialEffects(new BiomeSpecialEffects.Builder()
+                        .waterFogColor(0)
+                        .skyColor(0)
+                        .fogColor(0)
+                        .waterColor(0)
+                        .build())
+                .mobSpawnSettings(MobSpawnSettings.EMPTY)
+                .generationSettings(BiomeGenerationSettings.EMPTY)
+                .build(), biomes);
+    }
+
+    protected ResourceLocation addConfiguredCarver(ResourceLocation name, ConfiguredWorldCarver<?> carver) {
+        return add(name, carver, configuredCarvers);
+    }
+
+    protected Holder<ConfiguredWorldCarver<?>> getConfiguredCarver(ResourceLocation name) {
+        return get(name, () -> new ConfiguredWorldCarver<>(WorldCarver.CAVE, new CaveCarverConfiguration(1,
+                ConstantHeight.of(VerticalAnchor.absolute(0)), ConstantFloat.of(0), VerticalAnchor.absolute(0),
+                false, ConstantFloat.of(0), ConstantFloat.of(0), ConstantFloat.of(0))), configuredCarvers);
+    }
+
+    protected ResourceLocation addConfiguredFeature(ResourceLocation name, ConfiguredFeature<?, ?> feature) {
+        return add(name, feature, configuredFeatures);
+    }
+
+    protected Holder<ConfiguredFeature<?, ?>> getConfiguredFeature(ResourceLocation name) {
+        return get(name, () -> new ConfiguredFeature<>(Feature.NO_OP, FeatureConfiguration.NONE), configuredFeatures);
+    }
+
+    protected ResourceLocation addConfiguredStructureFeature(ResourceLocation name, ConfiguredStructureFeature<?, ?> feature) {
+        return add(name, feature, configuredStructureFeatures);
+    }
+
+    protected Holder<ConfiguredStructureFeature<?, ?>> getConfiguredStructureFeature(ResourceLocation name) {
+        return get(name, () -> new ConfiguredStructureFeature<>(StructureFeature.WOODLAND_MANSION, NoneFeatureConfiguration.INSTANCE,
+                HolderSet.direct(getBiome(name)), false, new HashMap<>()), configuredStructureFeatures);
+    }
+
+    protected ResourceLocation addDensityFunction(ResourceLocation name, DensityFunction function) {
+        return add(name, function, densityFunctions);
+    }
+
+    protected Holder<DensityFunction> getDensityFunction(ResourceLocation name) {
+        return get(name, () -> DensityFunctions.endIslands(0), densityFunctions);
+    }
+
+    protected ResourceLocation addNoiseParameter(ResourceLocation name, NormalNoise.NoiseParameters parameters) {
+        return add(name, parameters, noiseParameters);
+    }
+
+    protected Holder<NormalNoise.NoiseParameters> getNoiseParameter(ResourceLocation name) {
+        return get(name, () -> new NormalNoise.NoiseParameters(0, 0), noiseParameters);
+    }
+
+    protected ResourceLocation addNoiseGeneratorSettings(ResourceLocation name, NoiseGeneratorSettings settings) {
+        return add(name, settings, noiseGeneratorSettings);
+    }
+
+    protected Holder<NoiseGeneratorSettings> getNoiseGeneratorSettings(ResourceLocation name) {
+        return get(name, () -> {
+            NoiseSettings settings = NoiseSettings.create(16, 16, new NoiseSamplingSettings(1, 1, 1, 1),
+                    new NoiseSlider(0, 0, 0),
+                    new NoiseSlider(0, 0, 0), 0, 0,
+                    TerrainShaper.overworld(false));
+            NoiseRouterWithOnlyNoises router = new NoiseRouterWithOnlyNoises(
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value(),
+                    getDensityFunction(modLoc("dummy")).value()
+            );
+            BlockState block = Blocks.STONE.defaultBlockState();
+            BlockState fluid = Blocks.WATER.defaultBlockState();
+            SurfaceRules.RuleSource rule = sequence()
+                    .ifAbovePreliminarySurface(SurfaceRules.state(block))
+                    .build();
+            return new NoiseGeneratorSettings(settings, block, fluid, router, rule, 1,
+                    false, false, false, false);
+        }, noiseGeneratorSettings);
+    }
+
+    protected ResourceLocation addPlacedFeature(ResourceLocation name, PlacedFeature feature) {
+        return add(name, feature, placedFeatures);
+    }
+
+    protected Holder<PlacedFeature> getPlacedFeature(ResourceLocation name) {
+        return get(name, () -> new PlacedFeature(getConfiguredFeature(name), new LinkedList<>()), placedFeatures);
+    }
+
+    protected ResourceLocation addProcessorList(ResourceLocation name, StructureProcessorList list) {
+        return add(name, list, processorLists);
+    }
+
+    protected Holder<StructureProcessorList> getProcessorList(ResourceLocation name) {
+        return get(name, () -> new StructureProcessorList(new LinkedList<>()), processorLists);
+    }
+
+    protected ResourceLocation addStructureSet(ResourceLocation name, StructureSet set) {
+        return add(name, set, structureSets);
+    }
+
+    protected Holder<StructureSet> getStructureSet(ResourceLocation name) {
+        return get(name, () -> new StructureSet(getConfiguredStructureFeature(name),
+                new ConcentricRingsStructurePlacement(1, 1, 1)), structureSets);
+    }
+
+    protected ResourceLocation addTemplatePool(ResourceLocation name, StructureTemplatePool pool) {
+        return add(name, pool, templatePools);
+    }
+
+    protected Holder<StructureTemplatePool> getTemplatePool(ResourceLocation name) {
+        return get(name, () -> new StructureTemplatePool(name, name, new LinkedList<>()), templatePools);
+    }
+
+    protected <T> Holder<T> get(ResourceLocation name, Supplier<T> value, WritableRegistry<T> registry) {
+        ResourceKey<T> key = ResourceKey.create(registry.key(), name);
+        if (registry.containsKey(key)) {
+            return registry.getHolderOrThrow(key);
+        }
+        return register(name, value.get(), registry, false);
+    }
+
+    protected <T> ResourceLocation add(ResourceLocation name, T value, WritableRegistry<T> registry) {
+        ResourceKey key = registry.key();
+        Holder<T> holder = register(name, value, registry, true);
+        objects.computeIfAbsent(key, __ -> new HashMap<>()).put(name, holder.value());
+        return name;
+    }
+
+    private <T> Holder<T> register(ResourceLocation name, T value, WritableRegistry<T> registry, boolean override) {
+        if (registry.containsKey(name)) {
+            if (override) {
+                int id = registry.getId(registry.get(name));
+                return registry.registerOrOverride(OptionalInt.of(id), ResourceKey.create(registry.key(), name), value, Lifecycle.stable());
+            } else {
+                return registry.getHolderOrThrow(ResourceKey.create(registry.key(), name));
+            }
+        } else {
+            return registry.register(ResourceKey.create(registry.key(), name), value, Lifecycle.stable());
+        }
+    }
+
+    public RuleSourceSequence sequence() {
+        return new RuleSourceSequence();
+    }
+
     @Override
     public String getName() {
         return "Worldgen: " + modid;
     }
 
-    public record NamedCubicSplineBuilder<C>(CubicSpline.Builder<C> builder) {
-
-        public NamedCubicSplineBuilder<C> addPoint(float location, float value, float derivative) {
-            builder.addPoint(location, value, derivative);
-            return this;
-        }
-
-        public NamedCubicSplineBuilder<C> addPoint(float location, CubicSpline<C> value, float derivative) {
-            builder.addPoint(location, value, derivative);
-            return this;
-        }
-
-        public CubicSpline<C> build() {
-            return builder.build();
-        }
+    protected ResourceLocation modLoc(String name) {
+        return new ResourceLocation(modid, name);
     }
 
-    public record Type(@Nullable String name, DimensionType type) {
-
-        public Type(DimensionType type) {
-            this(null, type);
-        }
+    protected ResourceLocation mcLoc(String name) {
+        return new ResourceLocation(name);
     }
 
-    public record Stem(ResourceLocation dimension, ChunkGenerator generator, boolean useServerSeed) {
-
-        public Stem(ResourceLocation dimension, ChunkGenerator generator) {
-            this(dimension, generator, false);
-        }
-    }
-
-    public class RuleSourceSequence {
+    public static class RuleSourceSequence {
 
         private final List<SurfaceRules.RuleSource> rules = new ArrayList<>();
 
@@ -306,16 +375,6 @@ public abstract class WorldGenProvider implements DataProvider {
 
         public SurfaceRules.RuleSource build() {
             return SurfaceRules.sequence(rules.toArray(SurfaceRules.RuleSource[]::new));
-        }
-    }
-
-    class NoiseBasedChunkGenerator2 extends NoiseBasedChunkGenerator {
-
-        final ResourceLocation settings;
-
-        public NoiseBasedChunkGenerator2(Registry<NormalNoise.NoiseParameters> p_188609_, BiomeSource p_188610_, long p_188611_, ResourceLocation settings) {
-            super(p_188609_, p_188610_, p_188611_, () -> dummyNoiseSettings);
-            this.settings = settings;
         }
     }
 }

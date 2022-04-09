@@ -1,0 +1,16 @@
+{
+  "config": {
+    "yScale": 1.9,
+    "lava_level": {
+      "absolute": 2
+    },
+    "probability": 0.8,
+    "y": {
+      "absolute": 5
+    },
+    "horizontal_radius_multiplier": 1.5,
+    "vertical_radius_multiplier": 1.2,
+    "floor_level": 0.0
+  },
+  "type": "minecraft:cave"
+}

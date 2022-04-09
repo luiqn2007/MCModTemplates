@@ -12,7 +12,7 @@ import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -211,9 +211,9 @@ public record TreeRegister(Tree tree) {
      *
      * @param tag tag appender creator, use {@link TagsProvider#tag}
      */
-    public void addBlockTags(Function<Tag.Named<Block>, TagsProvider.TagAppender<Block>> tag) {
+    public void addBlockTags(Function<TagKey<Block>, TagsProvider.TagAppender<Block>> tag) {
         String name = (tree.name().getPath() + "_logs").toLowerCase(Locale.ROOT);
-        tree.tagLogs = BlockTags.createOptional(new ResourceLocation(tree.name().getNamespace(), name));
+        tree.tagLogs = BlockTags.create(new ResourceLocation(tree.name().getNamespace(), name));
         tag.apply(tree.tagLogs).add(tree.log(), tree.strippedLog(), tree.wood(), tree.strippedLog());
         tag.apply(BlockTags.SAPLINGS).add(tree.sapling());
         tag.apply(BlockTags.LOGS_THAT_BURN).addTag(tree.tagLogs);

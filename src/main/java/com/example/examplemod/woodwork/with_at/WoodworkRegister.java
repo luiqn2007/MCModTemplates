@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -47,6 +48,7 @@ import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public record WoodworkRegister(Woodwork woodwork) {
@@ -332,24 +334,24 @@ public record WoodworkRegister(Woodwork woodwork) {
     /**
      * call this method in {@link TagsProvider#addTags} or other equivalent method.
      *
-     * @param provider tag provider
+     * @param tag tag provider
      */
     @SuppressWarnings("JavadocReference")
-    public void addBlockTags(TagsProvider<Block> provider) {
-        provider.tag(BlockTags.PLANKS).add(woodwork.planks());
-        provider.tag(BlockTags.WOODEN_BUTTONS).add(woodwork.button());
-        provider.tag(BlockTags.WOODEN_DOORS).add(woodwork.door());
-        provider.tag(BlockTags.WOODEN_STAIRS).add(woodwork.stairs());
-        provider.tag(BlockTags.WOODEN_SLABS).add(woodwork.slab());
-        provider.tag(BlockTags.WOODEN_FENCES).add(woodwork.fence());
-        provider.tag(BlockTags.WOODEN_PRESSURE_PLATES).add(woodwork.pressurePlate());
-        provider.tag(BlockTags.WOODEN_TRAPDOORS).add(woodwork.trapdoor());
-        provider.tag(BlockTags.STANDING_SIGNS).add(woodwork.sign());
-        provider.tag(BlockTags.WALL_SIGNS).add(woodwork.wallSign());
-        provider.tag(BlockTags.FENCE_GATES).add(woodwork.fenceGate());
-        provider.tag(Tags.Blocks.FENCE_GATES_WOODEN).add(woodwork.fenceGate());
+    public void addBlockTags(Function<TagKey<Block>, TagsProvider.TagAppender<Block>> tag) {
+        tag.apply(BlockTags.PLANKS).add(woodwork.planks());
+        tag.apply(BlockTags.WOODEN_BUTTONS).add(woodwork.button());
+        tag.apply(BlockTags.WOODEN_DOORS).add(woodwork.door());
+        tag.apply(BlockTags.WOODEN_STAIRS).add(woodwork.stairs());
+        tag.apply(BlockTags.WOODEN_SLABS).add(woodwork.slab());
+        tag.apply(BlockTags.WOODEN_FENCES).add(woodwork.fence());
+        tag.apply(BlockTags.WOODEN_PRESSURE_PLATES).add(woodwork.pressurePlate());
+        tag.apply(BlockTags.WOODEN_TRAPDOORS).add(woodwork.trapdoor());
+        tag.apply(BlockTags.STANDING_SIGNS).add(woodwork.sign());
+        tag.apply(BlockTags.WALL_SIGNS).add(woodwork.wallSign());
+        tag.apply(BlockTags.FENCE_GATES).add(woodwork.fenceGate());
+        tag.apply(Tags.Blocks.FENCE_GATES_WOODEN).add(woodwork.fenceGate());
         if (woodwork.hasChest()) {
-            provider.tag(Tags.Blocks.CHESTS_WOODEN).add(woodwork.chest());
+            tag.apply(Tags.Blocks.CHESTS_WOODEN).add(woodwork.chest());
         }
 
     }
@@ -357,11 +359,11 @@ public record WoodworkRegister(Woodwork woodwork) {
     /**
      * call this method in {@link TagsProvider#addTags} or other equivalent method.
      *
-     * @param provider tag provider
+     * @param tag tag provider
      */
     @SuppressWarnings("JavadocReference")
-    public void addItemTags(TagsProvider<Item> provider) {
-        provider.tag(ItemTags.BOATS).add(woodwork.boat());
+    public void addItemTags(Function<TagKey<Item>, TagsProvider.TagAppender<Item>> tag) {
+        tag.apply(ItemTags.BOATS).add(woodwork.boat());
     }
 
     /**

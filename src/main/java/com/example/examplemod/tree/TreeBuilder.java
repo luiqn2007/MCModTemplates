@@ -1,6 +1,7 @@
 package com.example.examplemod.tree;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
@@ -212,14 +213,14 @@ public class TreeBuilder {
      */
     public TreeBuilder grower(Function<Random, ConfiguredFeature<?, ?>> feature) {
         this.grower = new AbstractTreeGrower() {
-            private ConfiguredFeature<?, ?> configuredFeature = null;
+            private Holder<ConfiguredFeature<?, ?>> configuredFeature = null;
             private boolean initialized = false;
 
             @Nullable
             @Override
-            protected ConfiguredFeature<?, ?> getConfiguredFeature(Random pRandom, boolean pLargeHive) {
+            protected Holder<ConfiguredFeature<?, ?>> getConfiguredFeature(Random pRandom, boolean pLargeHive) {
                 if (!initialized) {
-                    configuredFeature = feature.apply(pRandom);
+                    configuredFeature = Holder.direct(feature.apply(pRandom));
                     initialized = true;
                 }
                 return configuredFeature;
