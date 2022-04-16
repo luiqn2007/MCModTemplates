@@ -91,8 +91,8 @@ public class WoodworkBuilder {
     Function<Woodwork, ChestBlock> chest;
     @Nullable
     Function<Woodwork, ChestBlock> trappedChest = ModChestTrappedBlock::new;
-    Function<Woodwork, BlockItem> chestItem = defaultBlockItem(Woodwork::chest);
-    Function<Woodwork, BlockItem> trappedChestItem = defaultBlockItem(Woodwork::trappedChest);
+    Function<Woodwork, BlockItem> chestItem = ModChestBlockItem::new;
+    Function<Woodwork, BlockItem> trappedChestItem = ModChestTrappedBlockItem::new;
 
     Function<Woodwork, BoatItem> boat = woodwork -> {
         ModBoatItem item = new ModBoatItem(woodwork, new Item.Properties().stacksTo(1).tab(woodwork.tab));
