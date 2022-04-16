@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=top": {
+      "model": "examplemod:block/woodwork2_slab_top"
+    },
+    "type=bottom": {
+      "model": "examplemod:block/woodwork2_slab"
+    },
+    "type=double": {
+      "model": "examplemod:block/woodwork2_planks"
+    }
+  }
+}

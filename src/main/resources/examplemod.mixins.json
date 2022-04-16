@@ -3,13 +3,9 @@
   "compatibilityLevel": "JAVA_17",
   "package": "com.example.examplemod.mixin",
   "mixins": [
-    "item.axe.stripping.MixinAxeItem",
-    "woodwork.MixinBoat",
-    "woodwork.MixinBoatItem"
+    "item.axe.stripping.MixinAxeItem"
   ],
   "client": [
-    "woodwork.MixinBoatRenderer",
-    "woodwork.MixinSheets"
   ],
   "minVersion": "0.8"
 }

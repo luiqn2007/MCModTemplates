@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/door_top_rh",
-  "textures": {
-    "bottom": "examplemod:block/woodwork_mixin_planks",
-    "top": "examplemod:block/woodwork_mixin_planks"
-  }
-}

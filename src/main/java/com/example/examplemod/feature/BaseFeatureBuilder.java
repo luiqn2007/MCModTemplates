@@ -86,6 +86,16 @@ public abstract class BaseFeatureBuilder<C extends FeatureConfiguration, SELF ex
     public abstract SELF fromConfiguration(C parent);
 
     /**
+     * Create a configuration base on parent
+     *
+     * @param parent base configuration
+     * @return this builder
+     */
+    public SELF fromConfiguration(Holder<C> parent) {
+        return fromConfiguration(parent.value());
+    }
+
+    /**
      * Create a configuration
      *
      * @return configuration

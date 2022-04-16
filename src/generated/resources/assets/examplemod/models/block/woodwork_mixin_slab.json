@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "side": "examplemod:block/woodwork_mixin_planks",
-    "bottom": "examplemod:block/woodwork_mixin_planks",
-    "top": "examplemod:block/woodwork_mixin_planks"
-  }
-}

@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "examplemod:woodwork_at_sign",
-    "examplemod:woodwork_mixin_sign"
+    "examplemod:woodwork1_sign",
+    "examplemod:woodwork2_sign"
   ]
 }

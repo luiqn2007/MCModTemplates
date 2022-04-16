@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "examplemod:woodwork_at_fence_gate",
-    "examplemod:woodwork_mixin_fence_gate"
+    "examplemod:woodwork1_fence_gate",
+    "examplemod:woodwork2_fence_gate"
   ]
 }

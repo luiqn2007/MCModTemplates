@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "wooden_trapdoor",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "examplemod:woodwork2_planks"
+    }
+  },
+  "result": {
+    "item": "examplemod:woodwork2_trapdoor",
+    "count": 2
+  }
+}

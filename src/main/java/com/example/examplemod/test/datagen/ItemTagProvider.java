@@ -15,7 +15,7 @@ public class ItemTagProvider extends ItemTagsProvider {
 
     @Override
     protected void addTags() {
-        WoodworkTest.TEST_AT.register().addItemTags(this::tag);
-        WoodworkTest.TEST_MIXIN.register().addItemTags(this::tag);
+        WoodworkTest.WOODWORK_WITH_CHEST.register().addItemTags(this::tag);
+        WoodworkTest.WOODWORK_WITHOUT_CHEST.register().addItemTags(this::tag);
     }
 }

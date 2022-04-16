@@ -51,6 +51,6 @@ public abstract class UnexceptionalBlockStateProvider extends BlockStateProvider
     @Nonnull
     @Override
     public String getName() {
-        return "Unexceptional Block States: " + modid;
+        return "BlockStates: " + modid;
     }
 }

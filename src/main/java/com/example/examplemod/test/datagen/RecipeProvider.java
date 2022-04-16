@@ -17,7 +17,7 @@ public class RecipeProvider extends net.minecraft.data.recipes.RecipeProvider {
     @Override
     protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
         TreeTest.TREE.register().addRecipes(consumer, Blocks.COAL_ORE);
-        WoodworkTest.TEST_AT.register().addRecipes(consumer, Blocks.COPPER_ORE);
-        WoodworkTest.TEST_MIXIN.register().addRecipes(consumer, Blocks.IRON_ORE);
+        WoodworkTest.WOODWORK_WITH_CHEST.register().addRecipes(consumer, Blocks.COPPER_ORE);
+        WoodworkTest.WOODWORK_WITHOUT_CHEST.register().addRecipes(consumer, Blocks.IRON_ORE);
     }
 }

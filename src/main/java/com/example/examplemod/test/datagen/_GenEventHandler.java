@@ -26,6 +26,6 @@ public class _GenEventHandler {
         generator.addProvider(bp = new BlockTagProvider(generator, MOD_ID, helper));
         generator.addProvider(new ItemTagProvider(generator, bp, MOD_ID, helper));
         generator.addProvider(new BlockLootProvider(generator));
-        generator.addProvider(new WorldProvider(generator, MOD_ID));
+        // generator.addProvider(new WorldProvider(generator, MOD_ID));
     }
 }

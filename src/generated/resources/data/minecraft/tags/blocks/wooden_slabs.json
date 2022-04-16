@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "examplemod:woodwork_at_slab",
-    "examplemod:woodwork_mixin_slab"
+    "examplemod:woodwork1_slab",
+    "examplemod:woodwork2_slab"
   ]
 }

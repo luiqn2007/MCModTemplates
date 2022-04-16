@@ -66,7 +66,7 @@ public abstract class UnexceptionalItemModelProvider extends ItemModelProvider {
 
     @Override
     public String getName() {
-        return "Unexceptional Item Models: " + modid;
+        return "ItemModels: " + modid;
     }
 
     public void printAllExceptions() {

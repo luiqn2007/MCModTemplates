@@ -1,0 +1,38 @@
+package com.example.examplemod.woodwork;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.StandingAndWallBlockItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+
+import javax.annotation.Nullable;
+
+public class ModSignItem extends StandingAndWallBlockItem {
+
+    public ModSignItem(Item.Properties pProperties, Block pStandingBlock, Block pWallBlock) {
+        super(pStandingBlock, pWallBlock, pProperties);
+    }
+
+    public ModSignItem(Woodwork woodwork) {
+        this(new Properties().stacksTo(16).tab(woodwork.tab), woodwork.sign(), woodwork.wallSign());
+    }
+
+    protected boolean updateCustomBlockEntityTag(BlockPos pPos, Level pLevel, @Nullable Player pPlayer, ItemStack pStack, BlockState pState) {
+        boolean flag = super.updateCustomBlockEntityTag(pPos, pLevel, pPlayer, pStack, pState);
+        if (pPlayer != null) {
+            if (!pLevel.isClientSide && !flag && pPlayer instanceof ServerPlayer sp && pLevel.getBlockEntity(pPos) instanceof ModSignBlockEntity sign) {
+                sign.setPlayerWhoMayEdit(pPlayer.getUUID());
+                sp.connection.send(new ClientboundBlockUpdatePacket(pLevel, pPos));
+                WoodworkManager.network().sendToClient(new ModSignEditOpenPkt(pPos), sp);
+            }
+        }
+
+        return flag;
+    }
+}

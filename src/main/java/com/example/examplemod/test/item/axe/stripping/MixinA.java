@@ -1,6 +1,6 @@
 package com.example.examplemod.test.item.axe.stripping;
 
-import com.example.examplemod.item.axe.stripping.with_mixin.IStrippable;
+import com.example.examplemod.item.axe.stripping_mixin.IStrippable;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;

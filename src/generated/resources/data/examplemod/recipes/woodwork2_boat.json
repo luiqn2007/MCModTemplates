@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "boat",
+  "pattern": [
+    "# #",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "examplemod:woodwork2_planks"
+    }
+  },
+  "result": {
+    "item": "examplemod:woodwork2_boat"
+  }
+}

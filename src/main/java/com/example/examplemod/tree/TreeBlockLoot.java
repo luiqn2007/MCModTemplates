@@ -15,7 +15,7 @@ public class TreeBlockLoot extends BlockLoot {
     private static final float[] NORMAL_LEAVES_SAPLING_CHANCES = new float[]{0.05F, 0.0625F, 0.083333336F, 0.1F};
 
     private final Tree tree;
-    public final Set<Block> addedBlocks = new HashSet<>();
+    private final Set<Block> addedBlocks = new HashSet<>();
 
     public TreeBlockLoot(Tree tree) {
         this.tree = tree;

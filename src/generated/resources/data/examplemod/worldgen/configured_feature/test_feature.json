@@ -1,9 +1,0 @@
-{
-  "config": {
-    "tries": 5,
-    "xz_spread": 10,
-    "y_spread": 10,
-    "feature": "examplemod:test_placed"
-  },
-  "type": "minecraft:flower"
-}

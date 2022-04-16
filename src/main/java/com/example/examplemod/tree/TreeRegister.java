@@ -13,7 +13,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
@@ -157,17 +156,6 @@ public record TreeRegister(Tree tree) {
     private void addBlockItem(RegistryObject<? extends Block> block, ItemModelProvider provider) {
         String path = block.getId().getPath();
         provider.withExistingParent(path, provider.modLoc("block/" + path));
-    }
-
-    private void addBlockItem(RegistryObject<? extends Block> block, String postfix, ItemModelProvider provider) {
-        String path = block.getId().getPath();
-        provider.withExistingParent(path, provider.modLoc("block/" + path + "_" + postfix));
-    }
-
-    private void addItem(RegistryObject<? extends ItemLike> item, String type, ItemModelProvider provider) {
-        ResourceLocation name = item.get().asItem().delegate.name();
-        provider.singleTexture(name.getPath(), provider.mcLoc("item/" + type),
-                "layer0", provider.modLoc("item/" + name.getPath()));
     }
 
     /**

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top",
+  "textures": {
+    "bottom": "examplemod:block/woodwork1_door_bottom",
+    "top": "examplemod:block/woodwork1_door_top"
+  }
+}
