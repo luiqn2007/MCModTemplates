@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.phys.BlockHitResult;
 
-public abstract class ModSignBlock extends SignBlock {
+public abstract class ModSignBlock extends SignBlock implements IWoodwork {
 
     private final Woodwork woodwork;
 
@@ -81,6 +81,7 @@ public abstract class ModSignBlock extends SignBlock {
         }
     }
 
+    @Override
     public Woodwork getWoodwork() {
         return woodwork;
     }

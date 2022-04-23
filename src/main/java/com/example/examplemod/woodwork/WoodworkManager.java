@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @SuppressWarnings("ConstantConditions")
 public class WoodworkManager {
@@ -105,6 +107,18 @@ public class WoodworkManager {
 
     public static Set<ResourceLocation> allNames() {
         return Set.copyOf(byName.keySet());
+    }
+
+    public static boolean isEmpty() {
+        return byName.isEmpty();
+    }
+
+    public static void forEach(Consumer<Woodwork> consumer) {
+        byName.forEach((__, woodwork) -> consumer.accept(woodwork));
+    }
+
+    public static void forEach(BiConsumer<ResourceLocation, Woodwork> consumer) {
+        byName.forEach(consumer);
     }
 
     public static Woodwork register(WoodworkBuilder builder) {

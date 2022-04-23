@@ -6,6 +6,7 @@
     "item.axe.stripping.MixinAxeItem"
   ],
   "client": [
+    "woodwork.MixinSheets"
   ],
   "minVersion": "0.8"
 }

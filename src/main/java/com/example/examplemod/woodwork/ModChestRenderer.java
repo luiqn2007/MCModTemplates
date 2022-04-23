@@ -11,16 +11,15 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import java.util.Calendar;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
 public class ModChestRenderer<T extends ModChestBlockEntity> extends ChestRenderer<T> {
 
     private static final Map<WoodType, EnumMap<ChestType, Material>> NORMAL_MATERIALS = new HashMap<>();
     private static final Map<WoodType, EnumMap<ChestType, Material>> TRAPPED_MATERIALS = new HashMap<>();
+    private static boolean IS_MATERIAL_ADDED = false;
 
     private final boolean xmasTextures;
 
@@ -37,22 +36,20 @@ public class ModChestRenderer<T extends ModChestBlockEntity> extends ChestRender
         if (xmasTextures) {
             return super.getMaterial(blockEntity, chestType);
         }
-        return chooseMaterial(blockEntity instanceof ModChestTrappedBlockEntity, blockEntity.getWoodType(), chestType);
+        return getOrCreateMaterial(blockEntity.isTrapped(), blockEntity.getWoodType(), chestType);
     }
 
-    private Material chooseMaterial(boolean trapped, WoodType wood, ChestType type) {
+    private static Material getOrCreateMaterial(boolean trapped, WoodType wood, ChestType type) {
         return (trapped ? TRAPPED_MATERIALS : NORMAL_MATERIALS).computeIfAbsent(wood, __ -> {
             EnumMap<ChestType, Material> map = new EnumMap<>(ChestType.class);
-            switch (type) {
-                case LEFT -> map.put(type, chestMaterial(wood, "left", trapped));
-                case RIGHT -> map.put(type, chestMaterial(wood, "right", trapped));
-                case SINGLE -> map.put(type, chestMaterial(wood, null, trapped));
-            }
+            map.put(ChestType.LEFT, createChestMaterial(wood, "left", trapped));
+            map.put(ChestType.RIGHT, createChestMaterial(wood, "right", trapped));
+            map.put(ChestType.SINGLE, createChestMaterial(wood, null, trapped));
             return map;
         }).get(type);
     }
 
-    private Material chestMaterial(WoodType wood, @Nullable String part, boolean trapped) {
+    private static Material createChestMaterial(WoodType wood, @Nullable String part, boolean trapped) {
         if (wood == WoodType.OAK) {
             return new Material(Sheets.CHEST_SHEET, new ResourceLocation("entity/chest/" + part));
         } else {
@@ -62,5 +59,27 @@ public class ModChestRenderer<T extends ModChestBlockEntity> extends ChestRender
             if (part != null) rName.append('_').append(part);
             return new Material(Sheets.CHEST_SHEET, new ResourceLocation(rl.getNamespace(), "entity/chest/" + rName));
         }
+    }
+
+    public static void getAllMaterials(Consumer<Material> pMaterialConsumer) {
+        if (WoodworkManager.isEmpty()) {
+            return;
+        }
+        if (!IS_MATERIAL_ADDED) {
+            WoodworkManager.forEach(woodwork -> {
+                WoodType type = woodwork.type;
+                for (ChestType chestType : ChestType.values()) {
+                    if (woodwork.hasChest()) {
+                        getOrCreateMaterial(true, type, chestType);
+                    }
+                    if (woodwork.hasTrappedChest()) {
+                        getOrCreateMaterial(false, type, chestType);
+                    }
+                }
+            });
+            IS_MATERIAL_ADDED = true;
+        }
+        NORMAL_MATERIALS.forEach((woodType, map) -> map.forEach((chestType, material) -> pMaterialConsumer.accept(material)));
+        TRAPPED_MATERIALS.forEach((woodType, map) -> map.forEach((chestType, material) -> pMaterialConsumer.accept(material)));
     }
 }

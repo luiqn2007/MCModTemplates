@@ -216,7 +216,12 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         // orientable?
         provider.trapdoorBlock(woodwork.trapdoor(), texPlank, true);
         provider.stairsBlock(woodwork.stairs(), texPlank);
-        provider.buttonBlock(woodwork.button(), texPlank);
+        // button
+        {
+            provider.models().singleTexture(woodwork.button.getId().getPath() + "_inventory",
+                    provider.mcLoc(ModelProvider.BLOCK_FOLDER + "/button_inventory"), texPlank);
+            provider.buttonBlock(woodwork.button(), texPlank);
+        }
         provider.slabBlock(woodwork.slab(), texPlank, texPlank);
         provider.fenceGateBlock(woodwork.fenceGate(), texPlank);
         provider.fenceBlock(woodwork.fence(), texPlank);
@@ -238,16 +243,16 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         provider.doorBlock(door, doorBottom, doorTop);
 
         if (woodwork.chest != null) {
-            provider.simpleBlock(woodwork.chest(), provider.models().withExistingParent(woodwork.chest.getId().getPath(), provider.mcLoc("block/chest")).texture("particle", texPlank));
-        } 
+            provider.simpleBlock(woodwork.chest(), provider.models()
+                    .getBuilder(woodwork.chest.getId().getPath())
+                    .texture("particle", texPlank));
+        }
 
         if (woodwork.trappedChest != null) {
-            if (woodwork.chest != null) {
-                provider.simpleBlock(woodwork.trappedChest(), provider.models().withExistingParent(woodwork.trappedChest.getId().getPath(), provider.modLoc("block/" + woodwork.chest.getId().getPath())));
-            } else {
-                provider.simpleBlock(woodwork.trappedChest(), provider.models().withExistingParent(woodwork.trappedChest.getId().getPath(), provider.mcLoc("block/chest")).texture("particle", texPlank));
-            }
-        } 
+            provider.simpleBlock(woodwork.trappedChest(), provider.models()
+                    .getBuilder(woodwork.trappedChest.getId().getPath())
+                    .texture("particle", texPlank));
+        }
 
         provider.models().fenceInventory(woodwork.fence.getId().getPath() + "_inventory", texPlank);
     }
@@ -263,14 +268,14 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         addBlockItem(woodwork.slab, provider);
         addBlockItem(woodwork.fence, "inventory", provider);
         addBlockItem(woodwork.stairs, provider);
-        addBlockItem(woodwork.button, provider);
+        addBlockItem(woodwork.button, "inventory", provider);
         addBlockItem(woodwork.pressurePlate, provider);
         addBlockItem(woodwork.trapdoor, "bottom", provider);
         addBlockItem(woodwork.fenceGate, provider);
 
-        addItem(woodwork.boat, "generated", provider);
-        addItem(woodwork.door, "generated", provider);
-        addItem(woodwork.sign, "generated", provider);
+        addItem(woodwork.boat, provider);
+        addItem(woodwork.door, provider);
+        addItem(woodwork.sign, provider);
 
         ResourceLocation texPlank = new ResourceLocation(woodwork.planks.getId().getNamespace(),
                 ModelProvider.BLOCK_FOLDER + "/" + woodwork.planks.getId().getPath());
@@ -292,9 +297,9 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         provider.withExistingParent(path, provider.modLoc("block/" + path + "_" + postfix));
     }
 
-    private void addItem(RegistryObject<? extends ItemLike> item, String type, ItemModelProvider provider) {
+    private void addItem(RegistryObject<? extends ItemLike> item, ItemModelProvider provider) {
         ResourceLocation name = item.get().asItem().delegate.name();
-        provider.singleTexture(name.getPath(), provider.mcLoc("item/" + type),
+        provider.singleTexture(name.getPath(), provider.mcLoc("item/generated"),
                 "layer0", provider.modLoc("item/" + name.getPath()));
     }
 
@@ -402,6 +407,22 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
      */
     @SuppressWarnings("JavadocReference")
     public void addItemTags(Function<TagKey<Item>, TagsProvider.TagAppender<Item>> tag) {
+        tag.apply(ItemTags.PLANKS).add(woodwork.planks().asItem());
+        tag.apply(ItemTags.WOODEN_BUTTONS).add(woodwork.button().asItem());
+        tag.apply(ItemTags.WOODEN_DOORS).add(woodwork.door().asItem());
+        tag.apply(ItemTags.WOODEN_STAIRS).add(woodwork.stairs().asItem());
+        tag.apply(ItemTags.WOODEN_SLABS).add(woodwork.slab().asItem());
+        tag.apply(ItemTags.WOODEN_FENCES).add(woodwork.fence().asItem());
+        tag.apply(ItemTags.WOODEN_PRESSURE_PLATES).add(woodwork.pressurePlate().asItem());
+        tag.apply(ItemTags.WOODEN_TRAPDOORS).add(woodwork.trapdoor().asItem());
+        tag.apply(Tags.Items.FENCE_GATES_WOODEN).add(woodwork.fenceGate().asItem());
+        if (woodwork.hasChest()) {
+            tag.apply(Tags.Items.CHESTS_WOODEN).add(woodwork.chest().asItem());
+        }
+        if (woodwork.hasTrappedChest()) {
+            tag.apply(Tags.Items.CHESTS_TRAPPED).add(woodwork.trappedChest().asItem());
+            tag.apply(Tags.Items.CHESTS_WOODEN).add(woodwork.trappedChest().asItem());
+        }
         tag.apply(ItemTags.BOATS).add(woodwork.boat());
     }
 

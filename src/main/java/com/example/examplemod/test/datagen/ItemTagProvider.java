@@ -1,5 +1,6 @@
 package com.example.examplemod.test.datagen;
 
+import com.example.examplemod.test.tree.TreeTest;
 import com.example.examplemod.test.woodwork.WoodworkTest;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.BlockTagsProvider;
@@ -15,6 +16,7 @@ public class ItemTagProvider extends ItemTagsProvider {
 
     @Override
     protected void addTags() {
+        TreeTest.TREE.register().addItemTags(this::tag);
         WoodworkTest.WOODWORK_WITH_CHEST.register().addItemTags(this::tag);
         WoodworkTest.WOODWORK_WITHOUT_CHEST.register().addItemTags(this::tag);
     }

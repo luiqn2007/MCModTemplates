@@ -88,7 +88,7 @@ public class WoodworkBuilder {
             new DoubleHighBlockItem(woodwork.door(), new Item.Properties().tab(woodwork.tab));
 
     @Nullable
-    Function<Woodwork, ChestBlock> chest;
+    Function<Woodwork, ChestBlock> chest = ModChestBlock::new;
     @Nullable
     Function<Woodwork, ChestBlock> trappedChest = ModChestTrappedBlock::new;
     Function<Woodwork, BlockItem> chestItem = ModChestBlockItem::new;
@@ -136,7 +136,6 @@ public class WoodworkBuilder {
 
     public WoodworkBuilder(ResourceLocation name) {
         this.name = name;
-        this.chest = woodwork -> new ChestBlock(BlockBehaviour.Properties.copy(Blocks.CHEST).color(woodwork.plankColor), WoodworkManager::chestBlockEntityType);
     }
 
     public WoodworkBuilder defaultTab(CreativeModeTab tab) {

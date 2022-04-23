@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
-public class ModSignBlockEntity extends BlockEntity {
+public class ModSignBlockEntity extends BlockEntity implements IWoodworkEntity {
     private static final String[] RAW_TEXT_FIELD_NAMES = new String[]{"Text1", "Text2", "Text3", "Text4"};
     private static final String[] FILTERED_TEXT_FIELD_NAMES = new String[]{"FilteredText1", "FilteredText2", "FilteredText3", "FilteredText4"};
     private final Component[] messages = new Component[]{TextComponent.EMPTY, TextComponent.EMPTY, TextComponent.EMPTY, TextComponent.EMPTY};
@@ -103,11 +103,6 @@ public class ModSignBlockEntity extends BlockEntity {
         this.playerWhoMayEdit = playerWhoMayEdit;
     }
 
-    @Nullable
-    public UUID getPlayerWhoMayEdit() {
-        return this.playerWhoMayEdit;
-    }
-
     public boolean canPlayerEdit(@Nullable Player entity) {
         return entity != null && (playerWhoMayEdit == null || entity.getUUID().equals(playerWhoMayEdit));
     }
@@ -116,7 +111,7 @@ public class ModSignBlockEntity extends BlockEntity {
         for (Component component : this.getMessages(player.isTextFilteringEnabled())) {
             Style style = component.getStyle();
             ClickEvent clickevent = style.getClickEvent();
-            if (clickevent != null && clickevent.getAction() == ClickEvent.Action.RUN_COMMAND) {
+            if (player.getServer() != null && clickevent != null && clickevent.getAction() == ClickEvent.Action.RUN_COMMAND) {
                 player.getServer().getCommands().performCommand(this.createCommandSourceStack(player), clickevent.getValue());
             }
         }
@@ -128,7 +123,7 @@ public class ModSignBlockEntity extends BlockEntity {
         Component component = player == null ? new TextComponent("Sign") : player.getDisplayName();
         Objects.requireNonNull(level);
         return new CommandSourceStack(CommandSource.NULL, Vec3.atCenterOf(this.worldPosition), Vec2.ZERO,
-                (ServerLevel) level, 2, s, component, level.getServer(), player);
+                (ServerLevel) level, 2, s, component, Objects.requireNonNull(level.getServer()), player);
     }
 
     public DyeColor getColor() {

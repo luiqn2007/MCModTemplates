@@ -50,7 +50,8 @@ public class StreamUtils {
                         return Stream.empty();
                     }
                     if (list.size() == 1) {
-                        return Optional.of(list.get(0)).stream();
+                        T value = list.get(0);
+                        return value == null ? Stream.empty() : Stream.of(value);
                     }
                     return Optional.of(list.get(random.nextInt(list.size()))).stream();
                 }

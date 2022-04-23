@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.function.Supplier;
 
-public class ModChestBlock extends ChestBlock {
+public class ModChestBlock extends ChestBlock implements IWoodwork {
 
     private final Woodwork woodwork;
 
@@ -24,6 +24,7 @@ public class ModChestBlock extends ChestBlock {
         this.woodwork = woodwork;
     }
 
+    @Override
     public Woodwork getWoodwork() {
         return woodwork;
     }

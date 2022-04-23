@@ -55,9 +55,4 @@ public class TreeBlockLoot extends BlockLoot {
         }
         addedBlocks.add(block);
     }
-
-    public interface ILootable {
-
-        LootTable.Builder createLootBuilder();
-    }
 }

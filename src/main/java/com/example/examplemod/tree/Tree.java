@@ -1,6 +1,8 @@
 package com.example.examplemod.tree;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -11,7 +13,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -51,8 +52,8 @@ public class Tree {
 
     private final Set<Item> allItems = new HashSet<>();
 
-    @Nullable
     TagKey<Block> tagLogs;
+    TagKey<Item> tagItemLogs;
     TreeRegister register = new TreeRegister(this);
     private final BuilderProperties properties;
 
@@ -70,6 +71,10 @@ public class Tree {
                 builder.woodColor,
                 builder.strippedWoodColor);
 
+        if (builder.grower instanceof TreeSaplingGrower tsg) {
+            tsg.setTree(this);
+        }
+
         sapling = register(blocks, "sapling", asSupplier(builder.sapling, allBlocks));
         pottedSapling = register(blocks, "potted", "sapling", asSupplier(builder.pottedSapling, allBlocks));
         log = register(blocks, "log", asSupplier(builder.log, allBlocks));
@@ -84,6 +89,10 @@ public class Tree {
         register(items, wood, asSupplier(builder.woodItem, allItems));
         register(items, strippedWoods, asSupplier(builder.strippedWoodsItem, allItems));
         register(items, leaves, asSupplier(builder.leavesItem, allItems));
+
+        tagLogs = BlockTags.create(new ResourceLocation(properties.name.getNamespace(),
+                (properties.name.getPath() + "_logs").toLowerCase(Locale.ROOT)));
+        tagItemLogs = ItemTags.create(tagLogs().location());
 
         TREE_BY_NAME.put(properties.name, this);
     }
@@ -153,6 +162,10 @@ public class Tree {
 
     public TagKey<Block> tagLogs() {
         return Objects.requireNonNull(tagLogs);
+    }
+
+    public TagKey<Item> tagItemLogs() {
+        return Objects.requireNonNull(tagItemLogs);
     }
 
     public TreeRegister register() {

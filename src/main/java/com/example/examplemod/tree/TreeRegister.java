@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
@@ -200,13 +201,24 @@ public record TreeRegister(Tree tree) {
      * @param tag tag appender creator, use {@link TagsProvider#tag}
      */
     public void addBlockTags(Function<TagKey<Block>, TagsProvider.TagAppender<Block>> tag) {
-        String name = (tree.name().getPath() + "_logs").toLowerCase(Locale.ROOT);
-        tree.tagLogs = BlockTags.create(new ResourceLocation(tree.name().getNamespace(), name));
         tag.apply(tree.tagLogs).add(tree.log(), tree.strippedLog(), tree.wood(), tree.strippedLog());
         tag.apply(BlockTags.SAPLINGS).add(tree.sapling());
         tag.apply(BlockTags.LOGS_THAT_BURN).addTag(tree.tagLogs);
         tag.apply(BlockTags.FLOWER_POTS).add(tree.pottedSapling());
         tag.apply(BlockTags.LEAVES).add(tree.leaves());
+    }
+
+    /**
+     * call this method in {@link TagsProvider#addTags} or other equivalent method.
+     *
+     * @param tag tag appender creator, use {@link TagsProvider#tag}
+     */
+    public void addItemTags(Function<TagKey<Item>, TagsProvider.TagAppender<Item>> tag) {
+        tag.apply(tree.tagItemLogs)
+                .add(tree.log().asItem(), tree.strippedLog().asItem(), tree.wood().asItem(), tree.strippedLog().asItem());
+        tag.apply(ItemTags.SAPLINGS).add(tree.sapling().asItem());
+        tag.apply(ItemTags.LOGS_THAT_BURN).addTag(tree.tagItemLogs);
+        tag.apply(ItemTags.LEAVES).add(tree.leaves().asItem());
     }
 
     /**
