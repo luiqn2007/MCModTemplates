@@ -5,7 +5,6 @@ import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -14,11 +13,14 @@ import java.util.Collection;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class ExtendedBlockTagsProvider extends BlockTagsProvider {
+public abstract class ExtendedBlockTagsProvider extends BlockTagsProvider {
 
     public ExtendedBlockTagsProvider(DataGenerator generator, String modId, ExistingFileHelper existingFileHelper) {
         super(generator, modId, existingFileHelper);
     }
+
+    @Override
+    protected abstract void addTags();
 
     public void addPickaxe(Block... blocks) {
         add(BlockTags.MINEABLE_WITH_PICKAXE, blocks);
