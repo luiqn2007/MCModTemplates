@@ -67,7 +67,6 @@ public class Tree {
                 builder.barkLogColor,
                 builder.barkStrippedLogColor,
                 builder.grower,
-                builder.plankColor,
                 builder.woodColor,
                 builder.strippedWoodColor);
 
@@ -184,7 +183,6 @@ public class Tree {
                                     MaterialColor barkLogColor,
                                     MaterialColor barkStrippedLogColor,
                                     AbstractTreeGrower grower,
-                                    MaterialColor plankColor,
                                     MaterialColor woodColor,
                                     MaterialColor strippedWoodColor) {
     }

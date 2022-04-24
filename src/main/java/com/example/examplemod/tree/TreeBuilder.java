@@ -31,7 +31,6 @@ public class TreeBuilder {
     MaterialColor barkLogColor = MaterialColor.WOOD;
     MaterialColor topStrippedLogColor = MaterialColor.WOOD;
     MaterialColor barkStrippedLogColor = MaterialColor.WOOD;
-    MaterialColor plankColor = MaterialColor.WOOD;
     MaterialColor woodColor = MaterialColor.WOOD;
     MaterialColor strippedWoodColor = MaterialColor.WOOD;
     AbstractTreeGrower grower = new OakTreeGrower();
