@@ -1,14 +1,14 @@
 package com.example.examplemod.test.datagen;
 
 import com.example.examplemod.datagen.ForDeferredRegister;
-import com.example.examplemod.datagen.UnexceptionalBlockStateProvider;
+import com.example.examplemod.datagen.WarnBlockStateProvider;
 import com.example.examplemod.test.Registers;
 import com.example.examplemod.test.tree.TreeTest;
 import com.example.examplemod.test.woodwork.WoodworkTest;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class BlockStateProvider extends UnexceptionalBlockStateProvider {
+public class BlockStateProvider extends WarnBlockStateProvider {
 
     public BlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
         super(gen, modid, exFileHelper);

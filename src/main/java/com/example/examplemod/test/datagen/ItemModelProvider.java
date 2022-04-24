@@ -1,14 +1,14 @@
 package com.example.examplemod.test.datagen;
 
 import com.example.examplemod.datagen.ForDeferredRegister;
-import com.example.examplemod.datagen.UnexceptionalItemModelProvider;
+import com.example.examplemod.datagen.WarnItemModelProvider;
 import com.example.examplemod.test.Registers;
 import com.example.examplemod.test.tree.TreeTest;
 import com.example.examplemod.test.woodwork.WoodworkTest;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class ItemModelProvider extends UnexceptionalItemModelProvider {
+public class ItemModelProvider extends WarnItemModelProvider {
 
     public ItemModelProvider(DataGenerator generator, String modid, ExistingFileHelper helper) {
         super(generator, modid, helper);

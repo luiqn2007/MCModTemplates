@@ -10,21 +10,21 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 
-public abstract class UnexceptionalBlockStateProvider extends BlockStateProvider {
+public abstract class WarnBlockStateProvider extends BlockStateProvider {
 
     private final String modid;
-    private final UnexceptionalBlockModelProvider blockModels;
-    private final UnexceptionalItemModelProvider itemModels;
+    private final WarnBlockModelProvider blockModels;
+    private final WarnItemModelProvider itemModels;
 
-    public UnexceptionalBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
+    public WarnBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
         super(gen, modid, exFileHelper);
         this.modid = modid;
-        this.blockModels = new UnexceptionalBlockModelProvider(gen, modid, exFileHelper) {
+        this.blockModels = new WarnBlockModelProvider(gen, modid, exFileHelper) {
             @Override
             protected void registerModels() {
             }
         };
-        this.itemModels = new UnexceptionalItemModelProvider(gen, modid, this.blockModels.existingFileHelper) {
+        this.itemModels = new WarnItemModelProvider(gen, modid, this.blockModels.existingFileHelper) {
             @Override
             protected void registerModels() {
             }
