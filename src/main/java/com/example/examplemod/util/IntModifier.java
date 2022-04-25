@@ -2,17 +2,25 @@ package com.example.examplemod.util;
 
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public final class IntModifier {
 
     private final int baseValue;
-    private int delta = 0;
-    private List<Int2IntFunction> calcBefore;
-    private List<Int2IntFunction> calcAfter;
+    private final List<Int2IntFunction> calcBefore;
+    private final List<Int2IntFunction> calcAfter;
+    private int delta;
 
     public IntModifier(int baseValue) {
+        this(baseValue, 0, new LinkedList<>(), new LinkedList<>());
+    }
+
+    IntModifier(int baseValue, int delta, List<Int2IntFunction> calcBefore, List<Int2IntFunction> calcAfter) {
         this.baseValue = baseValue;
+        this.delta = delta;
+        this.calcBefore = calcBefore;
+        this.calcAfter = calcAfter;
     }
 
     public int getBaseValue() {
@@ -68,5 +76,9 @@ public final class IntModifier {
     public IntModifier calcAfter(Int2IntFunction func) {
         calcAfter.add(func);
         return this;
+    }
+
+    public IntModifier copy(int baseValue) {
+        return new IntModifier(baseValue, delta, calcBefore, calcAfter);
     }
 }

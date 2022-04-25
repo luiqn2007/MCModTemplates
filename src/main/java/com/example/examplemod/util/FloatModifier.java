@@ -2,17 +2,25 @@ package com.example.examplemod.util;
 
 import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public final class FloatModifier {
 
     private final float baseValue;
-    private float delta = 0;
-    private List<Float2FloatFunction> calcBefore;
-    private List<Float2FloatFunction> calcAfter;
+    private final List<Float2FloatFunction> calcBefore;
+    private final List<Float2FloatFunction> calcAfter;
+    private float delta;
 
     public FloatModifier(float baseValue) {
+        this(baseValue, 0, new LinkedList<>(), new LinkedList<>());
+    }
+
+    FloatModifier(float baseValue, float delta, List<Float2FloatFunction> calcBefore, List<Float2FloatFunction> calcAfter) {
         this.baseValue = baseValue;
+        this.delta = delta;
+        this.calcBefore = calcBefore;
+        this.calcAfter = calcAfter;
     }
 
     public float getBaseValue() {
@@ -68,5 +76,9 @@ public final class FloatModifier {
     public FloatModifier calcAfter(Float2FloatFunction func) {
         calcAfter.add(func);
         return this;
+    }
+
+    public FloatModifier copy(float baseValue) {
+        return new FloatModifier(baseValue, delta, new LinkedList<>(calcBefore), new LinkedList<>(calcAfter));
     }
 }
