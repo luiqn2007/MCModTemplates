@@ -15,8 +15,9 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.function.Function;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -95,7 +96,7 @@ public class Woodwork {
 
         this.planks = addBlock(builder.planks);
         this.sign = addBlock(builder.sign, WoodworkManager.signBlocks);
-        this.wallSign = addBlock(builder.wallSign, WoodworkManager.signBlocks);
+        this.wallSign = addBlock(builder.wallSign, false, WoodworkManager.signBlocks);
         this.pressurePlate = addBlock(builder.pressurePlate);
         this.trapdoor = addBlock(builder.trapdoor);
         this.stairs = addBlock(builder.stairs);
@@ -198,7 +199,7 @@ public class Woodwork {
         return register;
     }
 
-    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory, @Nullable Set<Block> entityBlocks) {
+    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory, boolean hasItem, @Nullable Set<Block> entityBlocks) {
         RegistryObject<B> block = register(WoodworkManager.blocks(), factory.name, () -> {
             B b = factory.newBlock(this);
             allBlocks.add(b);
@@ -207,16 +208,22 @@ public class Woodwork {
             }
             return b;
         });
-        register(WoodworkManager.items(), block, () -> {
-            BlockItem i = factory.newItem(this);
-            allItems.add(i);
-            return i;
-        });
+        if (hasItem) {
+            register(WoodworkManager.items(), block, () -> {
+                BlockItem i = factory.newItem(this);
+                allItems.add(i);
+                return i;
+            });
+        }
         return block;
     }
 
     private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory) {
-        return addBlock(factory, null);
+        return addBlock(factory, true, null);
+    }
+
+    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory, Set<Block> entityBlocks) {
+        return addBlock(factory, true, entityBlocks);
     }
 
     private <T extends IForgeRegistryEntry<? super T>> void register(DeferredRegister<? super T> register,
