@@ -15,8 +15,8 @@ public class ModChestBlockItem extends BlockItem {
         this.woodwork = woodwork;
     }
 
-    public ModChestBlockItem(Woodwork woodwork) {
-        this(woodwork, woodwork.chest(), new Properties().tab(woodwork.tab));
+    public ModChestBlockItem(Properties properties, Woodwork woodwork) {
+        this(woodwork, woodwork.chest(), properties);
     }
 
     public Woodwork getWoodwork() {

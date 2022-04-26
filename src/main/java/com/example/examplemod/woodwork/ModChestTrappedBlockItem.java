@@ -8,7 +8,7 @@ public class ModChestTrappedBlockItem extends ModChestBlockItem {
         super(woodwork, block, properties);
     }
 
-    public ModChestTrappedBlockItem(Woodwork woodwork) {
-        this(woodwork, woodwork.trappedChest(), new Properties().tab(woodwork.tab));
+    public ModChestTrappedBlockItem(Properties properties, Woodwork woodwork) {
+        this(woodwork, woodwork.trappedChest(), properties);
     }
 }

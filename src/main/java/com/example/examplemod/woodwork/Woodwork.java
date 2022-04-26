@@ -1,6 +1,7 @@
 package com.example.examplemod.woodwork;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -14,10 +15,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -95,34 +93,24 @@ public class Woodwork {
         this.type = WoodType.register(WoodType.create(name.toString()));
         this.tab = builder.tab;
 
-        this.planks = register(WoodworkManager.blocks(), "planks", asSupplier(builder.planks, allBlocks));
-        this.sign = register(WoodworkManager.blocks(), "sign", asSupplier(builder.sign, allBlocks, WoodworkManager.signBlocks, !builder.customSignEntity));
-        this.wallSign = register(WoodworkManager.blocks(), "wall_sign", asSupplier(builder.wallSign, allBlocks, WoodworkManager.signBlocks, !builder.customSignEntity));
-        this.pressurePlate = register(WoodworkManager.blocks(), "pressure_plate", asSupplier(builder.pressurePlate, allBlocks));
-        this.trapdoor = register(WoodworkManager.blocks(), "trapdoor", asSupplier(builder.trapdoor, allBlocks));
-        this.stairs = register(WoodworkManager.blocks(), "stairs", asSupplier(builder.stairs, allBlocks));
-        this.button = register(WoodworkManager.blocks(), "button", asSupplier(builder.button, allBlocks));
-        this.slab = register(WoodworkManager.blocks(), "slab", asSupplier(builder.slab, allBlocks));
-        this.fenceGate = register(WoodworkManager.blocks(), "fence_gate", asSupplier(builder.fenceGate, allBlocks));
-        this.fence = register(WoodworkManager.blocks(), "fence", asSupplier(builder.fence, allBlocks));
-        this.door = register(WoodworkManager.blocks(), "door", asSupplier(builder.door, allBlocks));
-        this.chest = builder.chest == null ? null : register(WoodworkManager.blocks(), "chest", asSupplier(builder.chest, allBlocks, WoodworkManager.chestBlocks, !builder.customChestEntity));
-        this.trappedChest = builder.trappedChest == null ? null : register(WoodworkManager.blocks(), "trapped_chest", asSupplier(builder.trappedChest, allBlocks, WoodworkManager.trappedChestBlocks, !builder.customTrappedChestEntity));
-
-        register(WoodworkManager.items(), planks, asSupplier(builder.planksItem, allItems));
-        register(WoodworkManager.items(), sign, asSupplier(builder.signItem, allItems));
-        register(WoodworkManager.items(), pressurePlate, asSupplier(builder.pressurePlateItem, allItems));
-        register(WoodworkManager.items(), trapdoor, asSupplier(builder.trapdoorItem, allItems));
-        register(WoodworkManager.items(), stairs, asSupplier(builder.stairsItem, allItems));
-        register(WoodworkManager.items(), button, asSupplier(builder.buttonItem, allItems));
-        register(WoodworkManager.items(), slab, asSupplier(builder.slabItem, allItems));
-        register(WoodworkManager.items(), fenceGate, asSupplier(builder.fenceGateItem, allItems));
-        register(WoodworkManager.items(), fence, asSupplier(builder.fenceItem, allItems));
-        register(WoodworkManager.items(), door, asSupplier(builder.doorItem, allItems));
-        if (chest != null) register(WoodworkManager.items(), chest, asSupplier(builder.chestItem, allItems));
-        if (trappedChest != null)
-            register(WoodworkManager.items(), trappedChest, asSupplier(builder.trappedChestItem, allItems));
-        boat = register(WoodworkManager.items(), "boat", asSupplier(builder.boat, allItems));
+        this.planks = addBlock(builder.planks);
+        this.sign = addBlock(builder.sign, WoodworkManager.signBlocks);
+        this.wallSign = addBlock(builder.wallSign, WoodworkManager.signBlocks);
+        this.pressurePlate = addBlock(builder.pressurePlate);
+        this.trapdoor = addBlock(builder.trapdoor);
+        this.stairs = addBlock(builder.stairs);
+        this.button = addBlock(builder.button);
+        this.slab = addBlock(builder.slab);
+        this.fenceGate = addBlock(builder.fenceGate);
+        this.fence = addBlock(builder.fence);
+        this.door = addBlock(builder.door);
+        this.chest = builder.chest.noBlock ? null : addBlock(builder.chest, WoodworkManager.chestBlocks);
+        this.trappedChest = builder.trappedChest.noBlock ? null : addBlock(builder.trappedChest, WoodworkManager.trappedChestBlocks);
+        this.boat = register(WoodworkManager.items(), "boat", () -> {
+            BoatItem item = builder.boat.apply(builder.boatProperties.apply(this), this);
+            allItems.add(item);
+            return item;
+        });
     }
 
     public ResourceLocation name() {
@@ -210,23 +198,25 @@ public class Woodwork {
         return register;
     }
 
-    private <T> Supplier<T> asSupplier(Function<Woodwork, T> factory, Set<? super T> collector, @Nullable Collection<? super T> list) {
-        return () -> {
-            T element = factory.apply(this);
-            collector.add(element);
-            if (list != null) {
-                list.add(element);
+    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory, @Nullable Set<Block> entityBlocks) {
+        RegistryObject<B> block = register(WoodworkManager.blocks(), factory.name, () -> {
+            B b = factory.newBlock(this);
+            allBlocks.add(b);
+            if (entityBlocks != null && !factory.customEntity) {
+                entityBlocks.add(b);
             }
-            return element;
-        };
+            return b;
+        });
+        register(WoodworkManager.items(), block, () -> {
+            BlockItem i = factory.newItem(this);
+            allItems.add(i);
+            return i;
+        });
+        return block;
     }
 
-    private <T> Supplier<T> asSupplier(Function<Woodwork, T> factory, Set<? super T> collector, @Nullable Collection<? super T> list, boolean check) {
-        return asSupplier(factory, collector, check ? list : null);
-    }
-
-    private <T> Supplier<T> asSupplier(Function<Woodwork, T> factory, Set<? super T> collector) {
-        return asSupplier(factory, collector, null);
+    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory) {
+        return addBlock(factory, null);
     }
 
     private <T extends IForgeRegistryEntry<? super T>> void register(DeferredRegister<? super T> register,

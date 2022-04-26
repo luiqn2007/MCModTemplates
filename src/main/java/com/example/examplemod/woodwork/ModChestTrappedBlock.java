@@ -21,8 +21,8 @@ public class ModChestTrappedBlock extends ModChestBlock {
         super(woodwork, properties, typeSupplier);
     }
 
-    public ModChestTrappedBlock(Woodwork woodwork) {
-        super(woodwork, Properties.copy(Blocks.TRAPPED_CHEST).color(woodwork.plankColor), WoodworkManager::trappedChestBlockEntityType);
+    public ModChestTrappedBlock(Properties properties, Woodwork woodwork) {
+        super(woodwork, properties, WoodworkManager::trappedChestBlockEntityType);
     }
 
     @Override

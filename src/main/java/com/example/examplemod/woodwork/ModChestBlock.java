@@ -1,7 +1,6 @@
 package com.example.examplemod.woodwork;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -19,8 +18,8 @@ public class ModChestBlock extends ChestBlock implements IWoodwork {
         this.woodwork = woodwork;
     }
 
-    protected ModChestBlock(Woodwork woodwork) {
-        super(Properties.copy(Blocks.CHEST).color(woodwork.plankColor), WoodworkManager::chestBlockEntityType);
+    protected ModChestBlock(Properties properties, Woodwork woodwork) {
+        super(properties, WoodworkManager::chestBlockEntityType);
         this.woodwork = woodwork;
     }
 

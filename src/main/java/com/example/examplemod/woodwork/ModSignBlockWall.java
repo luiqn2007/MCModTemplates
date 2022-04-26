@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -29,17 +28,9 @@ public class ModSignBlockWall extends ModSignBlock {
             Direction.EAST, Block.box(0.0D, 4.5D, 0.0D, 2.0D, 12.5D, 16.0D),
             Direction.WEST, Block.box(14.0D, 4.5D, 0.0D, 16.0D, 12.5D, 16.0D)));
 
-    public ModSignBlockWall(Woodwork woodwork, Properties properties) {
+    public ModSignBlockWall(Properties properties, Woodwork woodwork) {
         super(woodwork, properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, Boolean.FALSE));
-    }
-
-    public ModSignBlockWall(Woodwork woodwork) {
-        this(woodwork, Properties.of(Material.WOOD, woodwork.plankColor)
-                .noCollission()
-                .strength(1.0F)
-                .sound(SoundType.WOOD)
-                .lootFrom(woodwork.sign));
     }
 
     @Override
