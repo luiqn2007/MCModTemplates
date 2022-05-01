@@ -1,4 +1,6 @@
 {
+  "block.examplemod.chest1": "\u7BB11\u6728\u7BB1\u5B50",
+  "block.examplemod.chest2": "\u7BB13\u6728\u7BB1\u5B50",
   "block.examplemod.potted_test_tree_sapling": "\u6D4B\u8BD5\u6811\u82D7\u76C6\u683D",
   "block.examplemod.stripped_test_tree_log": "\u53BB\u76AE\u6D4B\u8BD5\u539F\u6728",
   "block.examplemod.stripped_test_tree_wood": "\u53BB\u76AE\u6D4B\u8BD5\u6728",
@@ -6,8 +8,9 @@
   "block.examplemod.test_tree_log": "\u6D4B\u8BD5\u539F\u6728",
   "block.examplemod.test_tree_sapling": "\u6D4B\u8BD5\u6811\u82D7",
   "block.examplemod.test_tree_wood": "\u6D4B\u8BD5\u6728",
+  "block.examplemod.trapped_chest1": "\u7BB12\u6728\u7BB1\u5B50",
+  "block.examplemod.trapped_chest3": "\u7BB13\u6728\u7BB1\u5B50",
   "block.examplemod.woodwork1_button": "\u6D4B\u8BD5\u67281\u6728\u6309\u94AE",
-  "block.examplemod.woodwork1_chest": "\u6D4B\u8BD5\u67281\u6728\u7BB1\u5B50",
   "block.examplemod.woodwork1_door": "\u6D4B\u8BD5\u67281\u6728\u95E8",
   "block.examplemod.woodwork1_fence": "\u6D4B\u8BD5\u67281\u6728\u6805\u680F",
   "block.examplemod.woodwork1_fence_gate": "\u6D4B\u8BD5\u67281\u6728\u6805\u680F\u95E8",
@@ -17,7 +20,6 @@
   "block.examplemod.woodwork1_slab": "\u6D4B\u8BD5\u67281\u6728\u53F0\u9636",
   "block.examplemod.woodwork1_stairs": "\u6D4B\u8BD5\u67281\u6728\u697C\u68AF",
   "block.examplemod.woodwork1_trapdoor": "\u6D4B\u8BD5\u67281\u6728\u6D3B\u677F\u95E8",
-  "block.examplemod.woodwork1_trapped_chest": "\u6D4B\u8BD5\u67281\u6728\u9677\u9631\u7BB1",
   "block.examplemod.woodwork1_wall_sign": "\u5899\u4E0A\u7684\u6D4B\u8BD5\u67281\u6728\u544A\u793A\u724C",
   "block.examplemod.woodwork2_button": "\u6D4B\u8BD5\u67282\u6728\u6309\u94AE",
   "block.examplemod.woodwork2_door": "\u6D4B\u8BD5\u67282\u6728\u95E8",
@@ -30,6 +32,5 @@
   "block.examplemod.woodwork2_stairs": "\u6D4B\u8BD5\u67282\u6728\u697C\u68AF",
   "block.examplemod.woodwork2_trapdoor": "\u6D4B\u8BD5\u67282\u6728\u6D3B\u677F\u95E8",
   "block.examplemod.woodwork2_wall_sign": "\u5899\u4E0A\u7684\u6D4B\u8BD5\u67282\u6728\u544A\u793A\u724C",
-  "item.examplemod.woodwork1_boat": "\u6D4B\u8BD5\u67281\u6728\u8239",
-  "item.examplemod.woodwork2_boat": "\u6D4B\u8BD5\u67282\u6728\u8239"
+  "item.examplemod.for_boat_boat": "\u8239-\u6728\u8239"
 }

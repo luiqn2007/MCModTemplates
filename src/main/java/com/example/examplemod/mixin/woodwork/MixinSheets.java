@@ -1,6 +1,6 @@
 package com.example.examplemod.mixin.woodwork;
 
-import com.example.examplemod.woodwork.ModChestRenderer;
+import com.example.examplemod.block.chest.WoodenChestRenderer;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.resources.model.Material;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +15,6 @@ public abstract class MixinSheets {
 
     @Inject(method = "getAllMaterials", at = @At("RETURN"))
     private static void injectGetAllMaterials(Consumer<Material> pMaterialConsumer, CallbackInfo ci) {
-        ModChestRenderer.getAllMaterials(pMaterialConsumer);
+        WoodenChestRenderer.getAllMaterials(pMaterialConsumer);
     }
 }

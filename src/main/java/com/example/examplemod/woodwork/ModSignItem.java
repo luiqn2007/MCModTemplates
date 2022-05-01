@@ -29,7 +29,9 @@ public class ModSignItem extends StandingAndWallBlockItem {
             if (!pLevel.isClientSide && !flag && pPlayer instanceof ServerPlayer sp && pLevel.getBlockEntity(pPos) instanceof ModSignBlockEntity sign) {
                 sign.setPlayerWhoMayEdit(pPlayer.getUUID());
                 sp.connection.send(new ClientboundBlockUpdatePacket(pLevel, pPos));
-                WoodworkManager.network().sendToClient(new ModSignEditOpenPkt(pPos), sp);
+                WoodworkManager.getManager(sign.getType())
+                        .map(WoodworkManager::network)
+                        .ifPresent(wn -> wn.sendToClient(new ModSignEditOpenPkt(pPos), sp));
             }
         }
 

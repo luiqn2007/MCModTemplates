@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "boat",
+  "pattern": [
+    "# #",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:iron_ore"
+    }
+  },
+  "result": {
+    "item": "examplemod:for_boat_boat"
+  }
+}

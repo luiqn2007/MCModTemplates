@@ -1,5 +1,8 @@
 package com.example.examplemod.test.datagen;
 
+import com.example.examplemod.test.TestBoat;
+import com.example.examplemod.test.TestChest;
+import com.example.examplemod.test.TestWoodwork;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -17,8 +20,15 @@ public class _GenEventHandler {
         DataGenerator generator = event.getGenerator();
         ExistingFileHelper helper = event.getExistingFileHelper();
 
-        BlockTagsProvider bp;
+        TestBoat.BOAT.get().register().verifyTexture(helper);
+        TestChest.CHEST1.get().register().verifyTexture(helper);
+        TestChest.TRAPPED_CHEST1.get().register().verifyTexture(helper);
+        TestChest.CHEST2.get().register().verifyTexture(helper);
+        TestChest.CHEST3.get().register().verifyTexture(helper);
+        TestWoodwork.WOODWORK1.register().verifyTexture(helper);
+        TestWoodwork.WOODWORK2.register().verifyTexture(helper);
 
+        BlockTagsProvider bp;
         generator.addProvider(new LanguageProvider(generator, MOD_ID));
         generator.addProvider(new BlockStateProvider(generator, MOD_ID, helper));
         generator.addProvider(new ItemModelProvider(generator, MOD_ID, helper));

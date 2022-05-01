@@ -3,13 +3,14 @@ package com.example.examplemod.woodwork;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import javax.annotation.Nullable;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BlockFactory<B extends Block, I extends BlockItem> {
+public class BlockFactory<B extends Block, I extends BlockItem, E extends BlockEntity> {
 
     WoodworkBuilder builder;
     String name;

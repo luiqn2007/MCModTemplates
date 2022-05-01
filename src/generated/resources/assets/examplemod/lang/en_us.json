@@ -1,4 +1,6 @@
 {
+  "block.examplemod.chest1": "Chest1 Trapped Chest",
+  "block.examplemod.chest2": "Chest2 Trapped Chest",
   "block.examplemod.potted_test_tree_sapling": "Potted TestTree Sapling",
   "block.examplemod.stripped_m_base": "[STRIP][MIXIN]Base",
   "block.examplemod.stripped_m_stripped": "[STRIP][MIXIN]Stripped",
@@ -8,8 +10,9 @@
   "block.examplemod.test_tree_log": "TestTree Log",
   "block.examplemod.test_tree_sapling": "TestTree Sapling",
   "block.examplemod.test_tree_wood": "TestTree Wood",
+  "block.examplemod.trapped_chest1": "Trapped Chest1 Trapped Chest",
+  "block.examplemod.trapped_chest3": "Trapped Chest3 Trapped Chest",
   "block.examplemod.woodwork1_button": "Woodwork1 Button",
-  "block.examplemod.woodwork1_chest": "Woodwork1 Chest",
   "block.examplemod.woodwork1_door": "Woodwork1 Door",
   "block.examplemod.woodwork1_fence": "Woodwork1 Fence",
   "block.examplemod.woodwork1_fence_gate": "Woodwork1 Fence Gate",
@@ -19,7 +22,6 @@
   "block.examplemod.woodwork1_slab": "Woodwork1 Slab",
   "block.examplemod.woodwork1_stairs": "Woodwork1 Stairs",
   "block.examplemod.woodwork1_trapdoor": "Woodwork1 Trap Trapdoor",
-  "block.examplemod.woodwork1_trapped_chest": "Woodwork1 Trapped Chest",
   "block.examplemod.woodwork1_wall_sign": "Woodwork1 Wall Sign",
   "block.examplemod.woodwork2_button": "_Test Tree_ Button",
   "block.examplemod.woodwork2_door": "_Test Tree_ Door",
@@ -32,7 +34,6 @@
   "block.examplemod.woodwork2_stairs": "_Test Tree_ Stairs",
   "block.examplemod.woodwork2_trapdoor": "_Test Tree_ Trap Trapdoor",
   "block.examplemod.woodwork2_wall_sign": "_Test Tree_ Wall Sign",
-  "item.examplemod.woodwork1_boat": "Woodwork1 Boat",
-  "item.examplemod.woodwork2_boat": "_Test Tree_ Boat",
+  "item.examplemod.for_boat_boat": "ForBoat Boat",
   "itemGroup.examplemod": "Template Examples"
 }

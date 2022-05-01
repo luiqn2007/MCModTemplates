@@ -2,14 +2,12 @@ package com.example.examplemod.woodwork;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.Util;
-import net.minecraft.advancements.critereon.EnterBlockTrigger;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.BlockFamily;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -18,10 +16,8 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
@@ -33,11 +29,9 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.ModelProvider;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
-import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.forgespi.Environment;
@@ -46,33 +40,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public record WoodworkRegisterHelper(Woodwork woodwork) {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static boolean IS_RENDERERS_REGISTERED = false;
 
     public void register(IEventBus bus) {
         WoodworkRegisterEvents events = new WoodworkRegisterEvents(this);
         bus.addListener(events::onSetup);
         bus.addListener(events::onClient);
-        MinecraftForge.EVENT_BUS.register(events.forge());
         if (Environment.get().getDist().isClient()) {
             bus.register(events.client());
-        }
-    }
-
-    public void registerFuel(FurnaceFuelBurnTimeEvent event) {
-        Item item = event.getItemStack().getItem();
-        if (woodwork.hasChest() && item == woodwork.chest().asItem()) {
-            event.setBurnTime(300);
-        } else if (woodwork.hasTrappedChest() && item == woodwork.trappedChest().asItem()) {
-            event.setBurnTime(300);
         }
     }
 
@@ -92,8 +77,6 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
      */
     @OnlyIn(Dist.CLIENT)
     public void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        // boat
-        if (woodwork.boatLayer == null) woodwork.boatLayer = ModBoatRenderer.registerLayer(woodwork, event);
         // sign
         // ModSignRenderer.registerLayer(woodwork, event);
     }
@@ -103,12 +86,11 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
      */
     @OnlyIn(Dist.CLIENT)
     public void registerRenderer(EntityRenderersEvent.RegisterRenderers event) {
-        if (!IS_RENDERERS_REGISTERED) {
-            event.registerEntityRenderer(WoodworkManager.boatEntityType(), ModBoatRenderer::new);
-            event.registerBlockEntityRenderer(WoodworkManager.signBlockEntityType(), ModSignRenderer::new);
-            event.registerBlockEntityRenderer(WoodworkManager.chestBlockEntityType(), ModChestRenderer::new);
-            event.registerBlockEntityRenderer(WoodworkManager.trappedChestBlockEntityType(), ModChestRenderer::new);
-            IS_RENDERERS_REGISTERED = true;
+        if (woodwork.useDefaultSignEntity()) {
+            event.registerBlockEntityRenderer(woodwork.signEntity(), ModSignRenderer::new);
+        }
+        if (woodwork.useDefaultWallSignEntity()) {
+            event.registerBlockEntityRenderer(woodwork.wallSignEntity(), ModSignRenderer::new);
         }
     }
 
@@ -133,13 +115,6 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         provider.addBlock(woodwork.fenceGate, chinese + "木栅栏门");
         provider.addBlock(woodwork.fence, chinese + "木栅栏");
         provider.addBlock(woodwork.door, chinese + "木门");
-        provider.addItem(woodwork.boat, chinese + "木船");
-        if (woodwork.chest != null) {
-            provider.addBlock(woodwork.chest, chinese + "木箱子");
-        }
-        if (woodwork.trappedChest != null) {
-            provider.addBlock(woodwork.trappedChest, chinese + "木陷阱箱");
-        }
     }
 
     /**
@@ -171,24 +146,13 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         provider.addBlock(woodwork.fenceGate, english + " Fence Gate");
         provider.addBlock(woodwork.fence, english + " Fence");
         provider.addBlock(woodwork.door, english + " Door");
-        provider.addItem(woodwork.boat, english + " Boat");
-        if (woodwork.chest != null) {
-            provider.addBlock(woodwork.chest, english + " Chest");
-        }
-        if (woodwork.trappedChest != null) {
-            provider.addBlock(woodwork.trappedChest, english + " Trapped Chest");
-        }
     }
 
     private String defaultEnglishName() {
-        StringBuilder sb = new StringBuilder();
-        for (String s : woodwork.name.getPath().split("_")) {
-            if (s.isEmpty()) continue;
-            String s1 = s.toLowerCase(Locale.ROOT);
-            sb.append(Character.toUpperCase(s1.charAt(0)));
-            sb.append(s1.substring(1));
-        }
-        return sb.toString();
+        return Arrays.stream(woodwork.name.getPath().split("_"))
+                .filter(s -> !s.isEmpty())
+                .map(s -> s.length() == 1 ? s.toUpperCase(Locale.ROOT) : Character.toUpperCase(s.charAt(0)) + s.substring(1))
+                .collect(Collectors.joining(" "));
     }
 
     /**
@@ -241,19 +205,6 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
             doorBottom = texPlank;
         }
         provider.doorBlock(door, doorBottom, doorTop);
-
-        if (woodwork.chest != null) {
-            provider.simpleBlock(woodwork.chest(), provider.models()
-                    .getBuilder(woodwork.chest.getId().getPath())
-                    .texture("particle", texPlank));
-        }
-
-        if (woodwork.trappedChest != null) {
-            provider.simpleBlock(woodwork.trappedChest(), provider.models()
-                    .getBuilder(woodwork.trappedChest.getId().getPath())
-                    .texture("particle", texPlank));
-        }
-
         provider.models().fenceInventory(woodwork.fence.getId().getPath() + "_inventory", texPlank);
     }
 
@@ -273,18 +224,8 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         addBlockItem(woodwork.trapdoor, "bottom", provider);
         addBlockItem(woodwork.fenceGate, provider);
 
-        addItem(woodwork.boat, provider);
         addItem(woodwork.door, provider);
         addItem(woodwork.sign, provider);
-
-        ResourceLocation texPlank = new ResourceLocation(woodwork.planks.getId().getNamespace(),
-                ModelProvider.BLOCK_FOLDER + "/" + woodwork.planks.getId().getPath());
-        if (woodwork.chest != null) {
-            provider.singleTexture(woodwork.chest.getId().getPath(), provider.mcLoc("item/chest"), "particle", texPlank);
-        }
-        if (woodwork.trappedChest != null) {
-            provider.singleTexture(woodwork.trappedChest.getId().getPath(), provider.mcLoc("item/chest"), "particle", texPlank);
-        }
     }
 
     private void addBlockItem(RegistryObject<? extends Block> block, ItemModelProvider provider) {
@@ -316,39 +257,12 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
                 .hasItems(ItemPredicate.Builder.item().of(ItemTags.LOGS).build());
         InventoryChangeTrigger.TriggerInstance hasPlank = InventoryChangeTrigger.TriggerInstance
                 .hasItems(ItemPredicate.Builder.item().of(woodwork.planks()).build());
-        EnterBlockTrigger.TriggerInstance inWater = EnterBlockTrigger.TriggerInstance.entersBlock(Blocks.WATER);
         // planksFromLog
         if (log != null) {
             ShapelessRecipeBuilder.shapeless(woodwork.planks(), 4).group("planks")
                     .requires(log)
                     .unlockedBy("has_log", hasLogs)
                     .save(consumer);
-        }
-
-        // woodenBoat
-        ShapedRecipeBuilder.shaped(woodwork.boat()).group("boat")
-                .define('#', woodwork.planks())
-                .pattern("# #")
-                .pattern("###")
-                .unlockedBy("in_water", inWater)
-                .save(consumer);
-
-        // chest
-        if (woodwork.hasChest()) {
-            ShapedRecipeBuilder.shaped(woodwork.chest()).group("chest")
-                    .define('#', woodwork.planks())
-                    .pattern("###")
-                    .pattern("# #")
-                    .pattern("###")
-                    .unlockedBy("has_planks", hasPlank)
-                    .save(consumer);
-            if (woodwork.hasTrappedChest()) {
-                ShapelessRecipeBuilder.shapeless(woodwork.trappedChest()).group("trapped_chest")
-                        .requires(woodwork.chest())
-                        .requires(Items.TRIPWIRE_HOOK)
-                        .unlockedBy("has_planks", hasPlank)
-                        .save(consumer);
-            }
         }
 
         BlockFamilyRegister.generateRecipes(consumer, new BlockFamily.Builder(woodwork.planks())
@@ -386,18 +300,6 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         tag.apply(BlockTags.WALL_SIGNS).add(woodwork.wallSign());
         tag.apply(BlockTags.FENCE_GATES).add(woodwork.fenceGate());
         tag.apply(Tags.Blocks.FENCE_GATES_WOODEN).add(woodwork.fenceGate());
-        if (woodwork.hasChest()) {
-            tag.apply(Tags.Blocks.CHESTS_WOODEN).add(woodwork.chest());
-            tag.apply(BlockTags.GUARDED_BY_PIGLINS).add(woodwork.chest());
-            tag.apply(BlockTags.MINEABLE_WITH_AXE).add(woodwork.chest());
-            tag.apply(BlockTags.FEATURES_CANNOT_REPLACE).add(woodwork.chest());
-        }
-        if (woodwork.hasTrappedChest()) {
-            tag.apply(Tags.Blocks.CHESTS_TRAPPED).add(woodwork.trappedChest());
-            tag.apply(Tags.Blocks.CHESTS_WOODEN).add(woodwork.trappedChest());
-            tag.apply(BlockTags.GUARDED_BY_PIGLINS).add(woodwork.trappedChest());
-            tag.apply(BlockTags.MINEABLE_WITH_AXE).add(woodwork.trappedChest());
-        }
     }
 
     /**
@@ -416,14 +318,6 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         tag.apply(ItemTags.WOODEN_PRESSURE_PLATES).add(woodwork.pressurePlate().asItem());
         tag.apply(ItemTags.WOODEN_TRAPDOORS).add(woodwork.trapdoor().asItem());
         tag.apply(Tags.Items.FENCE_GATES_WOODEN).add(woodwork.fenceGate().asItem());
-        if (woodwork.hasChest()) {
-            tag.apply(Tags.Items.CHESTS_WOODEN).add(woodwork.chest().asItem());
-        }
-        if (woodwork.hasTrappedChest()) {
-            tag.apply(Tags.Items.CHESTS_TRAPPED).add(woodwork.trappedChest().asItem());
-            tag.apply(Tags.Items.CHESTS_WOODEN).add(woodwork.trappedChest().asItem());
-        }
-        tag.apply(ItemTags.BOATS).add(woodwork.boat());
     }
 
     /**
@@ -437,5 +331,18 @@ public record WoodworkRegisterHelper(Woodwork woodwork) {
         WoodworkBlockLoot loot = new WoodworkBlockLoot(woodwork);
         consumer.accept(Pair.of(() -> loot, LootContextParamSets.BLOCK));
         return loot;
+    }
+
+    /**
+     * Call in somewhere can get ExistingFileHelper,
+     * like {@link net.minecraftforge.forge.event.lifecycle.GatherDataEvent} event
+     * @param helper file helper
+     */
+    public void verifyTexture(ExistingFileHelper helper) {
+        ResourceLocation woodName = new ResourceLocation(woodwork.type.name());
+        ResourceLocation tex = new ResourceLocation(woodName.getNamespace(), "textures/entity/signs/" + woodName.getPath() + ".png");
+        if (!helper.exists(tex, PackType.CLIENT_RESOURCES)) {
+            throw new RuntimeException("Not found sign skin at " + tex);
+        }
     }
 }

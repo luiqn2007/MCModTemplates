@@ -1,8 +1,9 @@
 package com.example.examplemod.woodwork;
 
-import net.minecraft.core.dispenser.DispenseItemBehavior;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DoubleHighBlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
@@ -17,13 +18,13 @@ import java.util.function.Function;
  */
 public class WoodworkBuilder {
 
-    final ResourceLocation name;
+    final String name;
     CreativeModeTab tab = CreativeModeTab.TAB_DECORATIONS;
     MaterialColor plankColor = MaterialColor.WOOD;
 
     Function<Woodwork, Item.Properties> defaultItemProperties = w -> new Item.Properties().tab(w.tab);
 
-    BlockFactory<Block, BlockItem> planks = new BlockFactory<>(this, "planks",
+    BlockFactory<Block, BlockItem, ?> planks = new BlockFactory<>(this, "planks",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.plankColor)
                     .strength(2.0F, 3.0F)
@@ -31,7 +32,7 @@ public class WoodworkBuilder {
             Block::new,
             defaultBlockItem(Woodwork::planks));
 
-    BlockFactory<SignBlock, BlockItem> sign = new BlockFactory<>(this, "sign",
+    BlockFactory<SignBlock, BlockItem, ?> sign = new BlockFactory<>(this, "sign",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.plankColor)
                     .noCollission()
@@ -40,7 +41,7 @@ public class WoodworkBuilder {
             w -> new Item.Properties().stacksTo(16).tab(w.tab),
             ModSignBlockStanding::new,
             ModSignItem::new);
-    BlockFactory<SignBlock, BlockItem> wallSign = new BlockFactory<>(this, "wall_sign",
+    BlockFactory<SignBlock, BlockItem, ?> wallSign = new BlockFactory<>(this, "wall_sign",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.plankColor)
                     .noCollission()
@@ -50,7 +51,7 @@ public class WoodworkBuilder {
             ModSignBlockWall::new,
             ModSignItem::new);
 
-    BlockFactory<PressurePlateBlock, BlockItem> pressurePlate = new BlockFactory<>(this, "pressure_plate",
+    BlockFactory<PressurePlateBlock, BlockItem, ?> pressurePlate = new BlockFactory<>(this, "pressure_plate",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.planks().defaultMaterialColor())
                     .noCollission()
@@ -59,7 +60,7 @@ public class WoodworkBuilder {
             (p, w) -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, p),
             defaultBlockItem(Woodwork::pressurePlate));
 
-    BlockFactory<TrapDoorBlock, BlockItem> trapdoor = new BlockFactory<>(this, "trapdoor",
+    BlockFactory<TrapDoorBlock, BlockItem, ?> trapdoor = new BlockFactory<>(this, "trapdoor",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.plankColor)
                     .strength(3.0F)
@@ -69,12 +70,12 @@ public class WoodworkBuilder {
             TrapDoorBlock::new,
             defaultBlockItem(Woodwork::trapdoor));
 
-    BlockFactory<StairBlock, BlockItem> stairs = new BlockFactory<>(this, "stairs",
+    BlockFactory<StairBlock, BlockItem, ?> stairs = new BlockFactory<>(this, "stairs",
             w -> BlockBehaviour.Properties.copy(w.planks()),
             (p, w) -> new StairBlock(() -> w.planks().defaultBlockState(), p),
             defaultBlockItem(Woodwork::stairs));
 
-    BlockFactory<ButtonBlock, BlockItem> button = new BlockFactory<>(this, "button",
+    BlockFactory<ButtonBlock, BlockItem, ?> button = new BlockFactory<>(this, "button",
             w -> BlockBehaviour.Properties
                     .of(Material.DECORATION)
                     .noCollission()
@@ -83,7 +84,7 @@ public class WoodworkBuilder {
             WoodButtonBlock::new,
             defaultBlockItem(Woodwork::button));
 
-    BlockFactory<SlabBlock, BlockItem> slab = new BlockFactory<>(this, "slab",
+    BlockFactory<SlabBlock, BlockItem, ?> slab = new BlockFactory<>(this, "slab",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.plankColor)
                     .strength(2.0F, 3.0F)
@@ -91,7 +92,7 @@ public class WoodworkBuilder {
             SlabBlock::new,
             defaultBlockItem(Woodwork::slab));
 
-    BlockFactory<FenceGateBlock, BlockItem> fenceGate = new BlockFactory<>(this, "fence_gate",
+    BlockFactory<FenceGateBlock, BlockItem, ?> fenceGate = new BlockFactory<>(this, "fence_gate",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.planks().defaultMaterialColor())
                     .strength(2.0F, 3.0F)
@@ -99,7 +100,7 @@ public class WoodworkBuilder {
             FenceGateBlock::new,
             defaultBlockItem(Woodwork::fenceGate));
 
-    BlockFactory<FenceBlock, BlockItem> fence = new BlockFactory<>(this, "fence",
+    BlockFactory<FenceBlock, BlockItem, ?> fence = new BlockFactory<>(this, "fence",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.planks().defaultMaterialColor())
                     .strength(2.0F, 3.0F)
@@ -107,7 +108,7 @@ public class WoodworkBuilder {
             FenceBlock::new,
             defaultBlockItem(Woodwork::fence));
 
-    BlockFactory<DoorBlock, BlockItem> door = new BlockFactory<>(this, "door",
+    BlockFactory<DoorBlock, BlockItem, ?> door = new BlockFactory<>(this, "door",
             w -> BlockBehaviour.Properties
                     .of(Material.WOOD, w.planks().defaultMaterialColor())
                     .strength(3.0F)
@@ -116,24 +117,7 @@ public class WoodworkBuilder {
             DoorBlock::new,
             (p, w) -> new DoubleHighBlockItem(w.door(), p));
 
-    BlockFactory<ChestBlock, BlockItem> chest = new BlockFactory<>(this, "chest",
-            w -> BlockBehaviour.Properties.copy(Blocks.CHEST).color(w.plankColor),
-            ModChestBlock::new,
-            ModChestBlockItem::new);
-
-    BlockFactory<ChestBlock, BlockItem> trappedChest = new BlockFactory<>(this, "trapped_chest",
-            w -> BlockBehaviour.Properties.copy(Blocks.TRAPPED_CHEST).color(w.plankColor),
-            ModChestTrappedBlock::new,
-            ModChestTrappedBlockItem::new);
-
-    Function<Woodwork, Item.Properties> boatProperties = w -> new Item.Properties().stacksTo(1).tab(w.tab);
-    BiFunction<Item.Properties, Woodwork, BoatItem> boat = (p, w) -> {
-        ModBoatItem item = new ModBoatItem(w, p);
-        DispenserBlock.registerBehavior(item, new DefaultBoatDispenseBehavior(w));
-        return item;
-    };
-
-    public WoodworkBuilder(ResourceLocation name) {
+    public WoodworkBuilder(String name) {
         this.name = name;
     }
 
@@ -141,6 +125,7 @@ public class WoodworkBuilder {
         this.tab = tab;
         return this;
     }
+
     public WoodworkBuilder plankColor(MaterialColor color) {
         this.plankColor = color;
         return this;
@@ -151,172 +136,326 @@ public class WoodworkBuilder {
         return this;
     }
 
-    public WoodworkBuilder customPlanks(Function<Woodwork, Block> factory) { return customBlock(planks, factory); }
-    public WoodworkBuilder customPlanks(BiFunction<BlockBehaviour.Properties, Woodwork, Block> factory) { return customBlock(planks, factory); }
-    public WoodworkBuilder customPlanksItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(planks, factory); }
-    public WoodworkBuilder customPlanksItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(planks, factory); }
-    public WoodworkBuilder customPlanksProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(planks, factory); }
-    public WoodworkBuilder customPlanksItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(planks, factory); }
-
-    public WoodworkBuilder customSign(Function<Woodwork, SignBlock> factory) { return customBlock(sign, factory); }
-    public WoodworkBuilder customSign(Function<Woodwork, SignBlock> factory, boolean customBlockEntity) { return customBlock(sign, customBlockEntity, factory); }
-    public WoodworkBuilder customSign(BiFunction<BlockBehaviour.Properties, Woodwork, SignBlock> factory) { return customBlock(sign, factory); }
-    public WoodworkBuilder customSign(BiFunction<BlockBehaviour.Properties, Woodwork, SignBlock> factory, boolean customBlockEntity) { return customBlock(sign, customBlockEntity, factory); }
-    public WoodworkBuilder customSignItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(sign, factory); }
-    public WoodworkBuilder customSignItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(sign, factory); }
-    public WoodworkBuilder customSignProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(sign, factory); }
-    public WoodworkBuilder customSignItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(sign, factory); }
-
-    public WoodworkBuilder customWallSign(Function<Woodwork, SignBlock> factory) { return customBlock(wallSign, factory); }
-    public WoodworkBuilder customWallSign(Function<Woodwork, SignBlock> factory, boolean customBlockEntity) { return customBlock(wallSign, customBlockEntity, factory); }
-    public WoodworkBuilder customWallSign(BiFunction<BlockBehaviour.Properties, Woodwork, SignBlock> factory) { return customBlock(wallSign, factory); }
-    public WoodworkBuilder customWallSign(BiFunction<BlockBehaviour.Properties, Woodwork, SignBlock> factory, boolean customBlockEntity) { return customBlock(wallSign, customBlockEntity, factory); }
-    public WoodworkBuilder customWallSignProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(wallSign, factory); }
-
-    public WoodworkBuilder customPressurePlate(Function<Woodwork, PressurePlateBlock> factory) { return customBlock(pressurePlate, factory); }
-    public WoodworkBuilder customPressurePlate(BiFunction<BlockBehaviour.Properties, Woodwork, PressurePlateBlock> factory) { return customBlock(pressurePlate, factory); }
-    public WoodworkBuilder customPressurePlateItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(pressurePlate, factory); }
-    public WoodworkBuilder customPressurePlateItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(pressurePlate, factory); }
-    public WoodworkBuilder customPressurePlateProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(pressurePlate, factory); }
-    public WoodworkBuilder customPressurePlateItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(pressurePlate, factory); }
-
-    public WoodworkBuilder customTrapdoor(Function<Woodwork, TrapDoorBlock> factory) { return customBlock(trapdoor, factory); }
-    public WoodworkBuilder customTrapdoor(BiFunction<BlockBehaviour.Properties, Woodwork, TrapDoorBlock> factory) { return customBlock(trapdoor, factory); }
-    public WoodworkBuilder customTrapdoorItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(trapdoor, factory); }
-    public WoodworkBuilder customTrapdoorItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(trapdoor, factory); }
-    public WoodworkBuilder customTrapdoorProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(trapdoor, factory); }
-    public WoodworkBuilder customTrapdoorItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(trapdoor, factory); }
-
-    public WoodworkBuilder customStairs(Function<Woodwork, StairBlock> factory) { return customBlock(stairs, factory); }
-    public WoodworkBuilder customStairs(BiFunction<BlockBehaviour.Properties, Woodwork, StairBlock> factory) { return customBlock(stairs, factory); }
-    public WoodworkBuilder customStairsItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(stairs, factory); }
-    public WoodworkBuilder customStairsItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(stairs, factory); }
-    public WoodworkBuilder customStairsProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(stairs, factory); }
-    public WoodworkBuilder customStairsItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(stairs, factory); }
-
-    public WoodworkBuilder customButton(Function<Woodwork, ButtonBlock> factory) { return customBlock(button, factory); }
-    public WoodworkBuilder customButton(BiFunction<BlockBehaviour.Properties, Woodwork, ButtonBlock> factory) { return customBlock(button, factory); }
-    public WoodworkBuilder customButtonItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(button, factory); }
-    public WoodworkBuilder customButtonItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(button, factory); }
-    public WoodworkBuilder customButtonProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(button, factory); }
-    public WoodworkBuilder customButtonItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(button, factory); }
-
-    public WoodworkBuilder customSlab(Function<Woodwork, SlabBlock> factory) { return customBlock(slab, factory); }
-    public WoodworkBuilder customSlab(BiFunction<BlockBehaviour.Properties, Woodwork, SlabBlock> factory) { return customBlock(slab, factory); }
-    public WoodworkBuilder customSlabItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(slab, factory); }
-    public WoodworkBuilder customSlabItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(slab, factory); }
-    public WoodworkBuilder customSlabProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(slab, factory); }
-    public WoodworkBuilder customSlabItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(slab, factory); }
-
-    public WoodworkBuilder customFence(Function<Woodwork, FenceBlock> factory) { return customBlock(fence, factory); }
-    public WoodworkBuilder customFence(BiFunction<BlockBehaviour.Properties, Woodwork, FenceBlock> factory) { return customBlock(fence, factory); }
-    public WoodworkBuilder customFenceItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(fence, factory); }
-    public WoodworkBuilder customFenceItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(fence, factory); }
-    public WoodworkBuilder customFenceProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(fence, factory); }
-    public WoodworkBuilder customFenceItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(fence, factory); }
-
-    public WoodworkBuilder customFenceGate(Function<Woodwork, FenceGateBlock> factory) { return customBlock(fenceGate, factory); }
-    public WoodworkBuilder customFenceGate(BiFunction<BlockBehaviour.Properties, Woodwork, FenceGateBlock> factory) { return customBlock(fenceGate, factory); }
-    public WoodworkBuilder customFenceGateItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(fenceGate, factory); }
-    public WoodworkBuilder customFenceGateItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(fenceGate, factory); }
-    public WoodworkBuilder customFenceGateProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(fenceGate, factory); }
-    public WoodworkBuilder customFenceGateItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(fenceGate, factory); }
-
-    public WoodworkBuilder customDoor(Function<Woodwork, DoorBlock> factory) { return customBlock(door, factory); }
-    public WoodworkBuilder customDoor(BiFunction<BlockBehaviour.Properties, Woodwork, DoorBlock> factory) { return customBlock(door, factory); }
-    public WoodworkBuilder customDoorItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(door, factory); }
-    public WoodworkBuilder customDoorItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(door, factory); }
-    public WoodworkBuilder customDoorProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(door, factory); }
-    public WoodworkBuilder customDoorItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(door, factory); }
-
-    public WoodworkBuilder noChest() {
-        chest.noBlock = true;
-        trappedChest.noBlock = true;
-        return this;
-    }
-    public WoodworkBuilder customChest(Function<Woodwork, ChestBlock> factory) { return customBlock(chest, factory); }
-    public WoodworkBuilder customChest(Function<Woodwork, ChestBlock> factory, boolean customBlockEntity) { return customBlock(chest, customBlockEntity, factory); }
-    public WoodworkBuilder customChest(BiFunction<BlockBehaviour.Properties, Woodwork, ChestBlock> factory) { return customBlock(chest, factory); }
-    public WoodworkBuilder customChest(BiFunction<BlockBehaviour.Properties, Woodwork, ChestBlock> factory, boolean customBlockEntity) { return customBlock(chest, customBlockEntity, factory); }
-    public WoodworkBuilder customChestItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(chest, factory); }
-    public WoodworkBuilder customChestItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(chest, factory); }
-    public WoodworkBuilder customChestProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(chest, factory); }
-    public WoodworkBuilder customChestItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(chest, factory); }
-    public WoodworkBuilder customTrappedChest(Function<Woodwork, ChestBlock> factory) { return customBlock(trappedChest, factory); }
-    public WoodworkBuilder customTrappedChest(Function<Woodwork, ChestBlock> factory, boolean customBlockEntity) { return customBlock(trappedChest, customBlockEntity, factory); }
-    public WoodworkBuilder customTrappedChest(BiFunction<BlockBehaviour.Properties, Woodwork, ChestBlock> factory) { return customBlock(trappedChest, factory); }
-    public WoodworkBuilder customTrappedChest(BiFunction<BlockBehaviour.Properties, Woodwork, ChestBlock> factory, boolean customBlockEntity) { return customBlock(trappedChest, customBlockEntity, factory); }
-    public WoodworkBuilder customTrappedChestItem(Function<Woodwork, BlockItem> factory) { return customBlockItem(trappedChest, factory); }
-    public WoodworkBuilder customTrappedChestItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) { return customBlockItem(trappedChest, factory); }
-    public WoodworkBuilder customTrappedChestProperties(Function<Woodwork, BlockBehaviour.Properties> factory) { return customProperties(trappedChest, factory); }
-    public WoodworkBuilder customTrappedChestItemProperties(Function<Woodwork, Item.Properties> factory) { return customItemProperties(trappedChest, factory); }
-
-    public WoodworkBuilder customBoatItemProperties(Function<Woodwork, Item.Properties> factory) {
-        this.boatProperties = factory;
-        return this;
-    }
-    public WoodworkBuilder customBoatItem(Function<Woodwork, BoatItem> factory) {
-        this.boat = (p, w) -> factory.apply(w);
-        return this;
-    }
-    public WoodworkBuilder customBoatItem(Function<Woodwork, BoatItem> factory, Function<Woodwork, DispenseItemBehavior> dispenseFactory) {
-        this.boat = (p, w) -> {
-            BoatItem item = factory.apply(w);
-            DispenserBlock.registerBehavior(item, dispenseFactory.apply(w));
-            return item;
-        };
-        return this;
-    }
-    public WoodworkBuilder customBoatItem(BiFunction<Item.Properties, Woodwork, BoatItem> factory) {
-        this.boat = factory;
-        return this;
-    }
-    public WoodworkBuilder customBoatItem(BiFunction<Item.Properties, Woodwork, BoatItem> factory, Function<Woodwork, DispenseItemBehavior> dispenseFactory) {
-        this.boat = (p, w) -> {
-            BoatItem item = factory.apply(p, w);
-            DispenserBlock.registerBehavior(item, dispenseFactory.apply(w));
-            return item;
-        };
-        return this;
+    public WoodworkBuilder customPlanks(Function<Woodwork, Block> factory) {
+        return customBlock(planks, factory);
     }
 
-    private <T extends Block> WoodworkBuilder customBlock(BlockFactory<T, ?> holder, boolean customEntity, Function<Woodwork, T> factory) {
+    public WoodworkBuilder customPlanks(BiFunction<BlockBehaviour.Properties, Woodwork, Block> factory) {
+        return customBlock(planks, factory);
+    }
+
+    public WoodworkBuilder customPlanksItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(planks, factory);
+    }
+
+    public WoodworkBuilder customPlanksItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(planks, factory);
+    }
+
+    public WoodworkBuilder customPlanksProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(planks, factory);
+    }
+
+    public WoodworkBuilder customPlanksItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(planks, factory);
+    }
+
+    public WoodworkBuilder customSign(Function<Woodwork, SignBlock> factory) {
+        return customBlock(sign, factory);
+    }
+
+    public WoodworkBuilder customSign(Function<Woodwork, SignBlock> factory, boolean customEntity) {
+        return customBlock(sign, customEntity, factory);
+    }
+
+    public WoodworkBuilder customSign(BiFunction<BlockBehaviour.Properties, Woodwork, SignBlock> factory) {
+        return customBlock(sign, factory);
+    }
+
+    public WoodworkBuilder customSign(BiFunction<BlockBehaviour.Properties, Woodwork, SignBlock> factory, boolean customEntity) {
+        return customBlock(sign, customEntity, factory);
+    }
+    
+    public WoodworkBuilder customSignEntity(boolean customEntity) {
+        return customBlockEntity(sign, customEntity);
+    }
+
+    public WoodworkBuilder customSignItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(sign, factory);
+    }
+
+    public WoodworkBuilder customSignItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(sign, factory);
+    }
+
+    public WoodworkBuilder customSignProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(sign, factory);
+    }
+
+    public WoodworkBuilder customSignItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(sign, factory);
+    }
+
+    public WoodworkBuilder customWallSign(Function<Woodwork, SignBlock> factory) {
+        return customBlock(wallSign, factory);
+    }
+
+    public WoodworkBuilder customWallSign(Function<Woodwork, SignBlock> factory, boolean customEntity) {
+        return customBlock(wallSign, customEntity, factory);
+    }
+
+    public WoodworkBuilder customWallSign(BiFunction<BlockBehaviour.Properties, Woodwork, SignBlock> factory) {
+        return customBlock(wallSign, factory);
+    }
+
+    public WoodworkBuilder customWallSign(BiFunction<BlockBehaviour.Properties, Woodwork, SignBlock> factory, boolean customEntity) {
+        return customBlock(wallSign, customEntity, factory);
+    }
+
+    public WoodworkBuilder customWallSignProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(wallSign, factory);
+    }
+
+    public WoodworkBuilder customWallSignEntity(boolean customEntity) {
+        return customBlockEntity(wallSign, customEntity);
+    }
+
+    public WoodworkBuilder customPressurePlate(Function<Woodwork, PressurePlateBlock> factory) {
+        return customBlock(pressurePlate, factory);
+    }
+
+    public WoodworkBuilder customPressurePlate(BiFunction<BlockBehaviour.Properties, Woodwork, PressurePlateBlock> factory) {
+        return customBlock(pressurePlate, factory);
+    }
+
+    public WoodworkBuilder customPressurePlateItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(pressurePlate, factory);
+    }
+
+    public WoodworkBuilder customPressurePlateItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(pressurePlate, factory);
+    }
+
+    public WoodworkBuilder customPressurePlateProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(pressurePlate, factory);
+    }
+
+    public WoodworkBuilder customPressurePlateItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(pressurePlate, factory);
+    }
+
+    public WoodworkBuilder customTrapdoor(Function<Woodwork, TrapDoorBlock> factory) {
+        return customBlock(trapdoor, factory);
+    }
+
+    public WoodworkBuilder customTrapdoor(BiFunction<BlockBehaviour.Properties, Woodwork, TrapDoorBlock> factory) {
+        return customBlock(trapdoor, factory);
+    }
+
+    public WoodworkBuilder customTrapdoorItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(trapdoor, factory);
+    }
+
+    public WoodworkBuilder customTrapdoorItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(trapdoor, factory);
+    }
+
+    public WoodworkBuilder customTrapdoorProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(trapdoor, factory);
+    }
+
+    public WoodworkBuilder customTrapdoorItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(trapdoor, factory);
+    }
+
+    public WoodworkBuilder customStairs(Function<Woodwork, StairBlock> factory) {
+        return customBlock(stairs, factory);
+    }
+
+    public WoodworkBuilder customStairs(BiFunction<BlockBehaviour.Properties, Woodwork, StairBlock> factory) {
+        return customBlock(stairs, factory);
+    }
+
+    public WoodworkBuilder customStairsItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(stairs, factory);
+    }
+
+    public WoodworkBuilder customStairsItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(stairs, factory);
+    }
+
+    public WoodworkBuilder customStairsProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(stairs, factory);
+    }
+
+    public WoodworkBuilder customStairsItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(stairs, factory);
+    }
+
+    public WoodworkBuilder customButton(Function<Woodwork, ButtonBlock> factory) {
+        return customBlock(button, factory);
+    }
+
+    public WoodworkBuilder customButton(BiFunction<BlockBehaviour.Properties, Woodwork, ButtonBlock> factory) {
+        return customBlock(button, factory);
+    }
+
+    public WoodworkBuilder customButtonItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(button, factory);
+    }
+
+    public WoodworkBuilder customButtonItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(button, factory);
+    }
+
+    public WoodworkBuilder customButtonProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(button, factory);
+    }
+
+    public WoodworkBuilder customButtonItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(button, factory);
+    }
+
+    public WoodworkBuilder customSlab(Function<Woodwork, SlabBlock> factory) {
+        return customBlock(slab, factory);
+    }
+
+    public WoodworkBuilder customSlab(BiFunction<BlockBehaviour.Properties, Woodwork, SlabBlock> factory) {
+        return customBlock(slab, factory);
+    }
+
+    public WoodworkBuilder customSlabItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(slab, factory);
+    }
+
+    public WoodworkBuilder customSlabItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(slab, factory);
+    }
+
+    public WoodworkBuilder customSlabProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(slab, factory);
+    }
+
+    public WoodworkBuilder customSlabItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(slab, factory);
+    }
+
+    public WoodworkBuilder customFence(Function<Woodwork, FenceBlock> factory) {
+        return customBlock(fence, factory);
+    }
+
+    public WoodworkBuilder customFence(BiFunction<BlockBehaviour.Properties, Woodwork, FenceBlock> factory) {
+        return customBlock(fence, factory);
+    }
+
+    public WoodworkBuilder customFenceItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(fence, factory);
+    }
+
+    public WoodworkBuilder customFenceItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(fence, factory);
+    }
+
+    public WoodworkBuilder customFenceProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(fence, factory);
+    }
+
+    public WoodworkBuilder customFenceItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(fence, factory);
+    }
+
+    public WoodworkBuilder customFenceGate(Function<Woodwork, FenceGateBlock> factory) {
+        return customBlock(fenceGate, factory);
+    }
+
+    public WoodworkBuilder customFenceGate(BiFunction<BlockBehaviour.Properties, Woodwork, FenceGateBlock> factory) {
+        return customBlock(fenceGate, factory);
+    }
+
+    public WoodworkBuilder customFenceGateItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(fenceGate, factory);
+    }
+
+    public WoodworkBuilder customFenceGateItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(fenceGate, factory);
+    }
+
+    public WoodworkBuilder customFenceGateProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(fenceGate, factory);
+    }
+
+    public WoodworkBuilder customFenceGateItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(fenceGate, factory);
+    }
+
+    public WoodworkBuilder customDoor(Function<Woodwork, DoorBlock> factory) {
+        return customBlock(door, factory);
+    }
+
+    public WoodworkBuilder customDoor(BiFunction<BlockBehaviour.Properties, Woodwork, DoorBlock> factory) {
+        return customBlock(door, factory);
+    }
+
+    public WoodworkBuilder customDoorItem(Function<Woodwork, BlockItem> factory) {
+        return customBlockItem(door, factory);
+    }
+
+    public WoodworkBuilder customDoorItem(BiFunction<Item.Properties, Woodwork, BlockItem> factory) {
+        return customBlockItem(door, factory);
+    }
+
+    public WoodworkBuilder customDoorProperties(Function<Woodwork, BlockBehaviour.Properties> factory) {
+        return customProperties(door, factory);
+    }
+
+    public WoodworkBuilder customDoorItemProperties(Function<Woodwork, Item.Properties> factory) {
+        return customItemProperties(door, factory);
+    }
+
+    private <T extends Block> WoodworkBuilder customBlock(BlockFactory<T, ?, ?> holder, boolean customEntity, Function<Woodwork, T> factory) {
         holder.factory = (p, w) -> factory.apply(w);
         holder.customEntity = customEntity;
         return this;
     }
 
-    private <T extends Block> WoodworkBuilder customBlock(BlockFactory<T, ?> holder, Function<Woodwork, T> factory) {
-        return customBlock(holder, true, factory);
+    private <T extends Block> WoodworkBuilder customBlock(BlockFactory<T, ?, ?> holder, Function<Woodwork, T> factory) {
+        holder.factory = (p, w) -> factory.apply(w);
+        return this;
     }
 
-    private <T extends Block> WoodworkBuilder customBlock(BlockFactory<T, ?> holder, boolean customEntity, BiFunction<BlockBehaviour.Properties, Woodwork, T> factory) {
+    private <T extends Block> WoodworkBuilder customBlock(BlockFactory<T, ?, ?> holder, boolean customEntity, BiFunction<BlockBehaviour.Properties, Woodwork, T> factory) {
         holder.factory = factory;
         holder.customEntity = customEntity;
         return this;
     }
 
-    private <T extends Block> WoodworkBuilder customBlock(BlockFactory<T, ?> holder, BiFunction<BlockBehaviour.Properties, Woodwork, T> factory) {
-        return customBlock(holder, true, factory);
+    private <T extends Block> WoodworkBuilder customBlock(BlockFactory<T, ?, ?> holder, BiFunction<BlockBehaviour.Properties, Woodwork, T> factory) {
+        holder.factory = factory;
+        return this;
     }
 
-    private <T extends BlockItem> WoodworkBuilder customBlockItem(BlockFactory<?, T> holder, Function<Woodwork, T> factory) {
+    private <T extends BlockItem> WoodworkBuilder customBlockItem(BlockFactory<?, T, ?> holder, Function<Woodwork, T> factory) {
         holder.itemFactory = (p, w) -> factory.apply(w);
         return this;
     }
 
-    private <T extends BlockItem> WoodworkBuilder customBlockItem(BlockFactory<?, T> holder, BiFunction<Item.Properties, Woodwork, T> factory) {
+    private <T extends BlockItem> WoodworkBuilder customBlockItem(BlockFactory<?, T, ?> holder, BiFunction<Item.Properties, Woodwork, T> factory) {
         holder.itemFactory = factory;
         return this;
     }
 
-    private WoodworkBuilder customProperties(BlockFactory<?, ?> holder, Function<Woodwork, BlockBehaviour.Properties> factory) {
+    private WoodworkBuilder customProperties(BlockFactory<?, ?, ?> holder, Function<Woodwork, BlockBehaviour.Properties> factory) {
         holder.properties = factory;
         return this;
     }
 
-    private WoodworkBuilder customItemProperties(BlockFactory<?, ?> holder, Function<Woodwork, Item.Properties> factory) {
+    private WoodworkBuilder customItemProperties(BlockFactory<?, ?, ?> holder, Function<Woodwork, Item.Properties> factory) {
         holder.itemProperties = factory;
+        return this;
+    }
+
+    private WoodworkBuilder customBlockEntity(BlockFactory<?, ?, ?> holder, boolean customEntity) {
+        holder.customEntity = customEntity;
         return this;
     }
 
@@ -324,7 +463,7 @@ public class WoodworkBuilder {
         return (prop, woodwork) -> new BlockItem(block.apply(woodwork), prop);
     }
 
-    public Woodwork build() {
-        return new Woodwork(this);
+    public Woodwork build(WoodworkManager manager) {
+        return new Woodwork(this, manager);
     }
 }

@@ -32,12 +32,6 @@ public class WoodworkBlockLoot extends BlockLoot {
         addDrop(woodwork.fenceGate(), BlockLoot::createSingleItemTable);
         addDrop(woodwork.fence(), BlockLoot::createSingleItemTable);
         addDrop(woodwork.door(), BlockLoot::createDoorTable);
-        if (woodwork.hasChest()) {
-            addDrop(woodwork.chest(), BlockLoot::createNameableBlockEntityTable);
-        }
-        if (woodwork.hasTrappedChest()) {
-            addDrop(woodwork.trappedChest(), BlockLoot::createNameableBlockEntityTable);
-        }
     }
 
     @Override

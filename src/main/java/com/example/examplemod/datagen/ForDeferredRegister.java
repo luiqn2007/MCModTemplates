@@ -38,7 +38,7 @@ public class ForDeferredRegister<T extends IForgeRegistryEntry<T>> {
         return this;
     }
 
-    public ForDeferredRegister<T> skip(Supplier<T> block) {
+    public ForDeferredRegister<T> skip(Supplier<? extends T> block) {
         skips.add(block.get());
         return this;
     }

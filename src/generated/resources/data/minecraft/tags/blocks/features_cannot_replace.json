@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "examplemod:woodwork1_chest"
+    "examplemod:chest1",
+    "examplemod:chest2"
   ]
 }

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/chest",
-  "textures": {
-    "particle": "examplemod:block/woodwork1_planks"
-  }
-}

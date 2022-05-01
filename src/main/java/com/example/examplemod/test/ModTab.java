@@ -7,9 +7,7 @@ import net.minecraft.world.item.Items;
 
 public class ModTab extends CreativeModeTab {
 
-    public static final ModTab INNSTANCE = new ModTab();
-
-    public ModTab() {
+    ModTab() {
         super(ExampleMod.MOD_ID);
     }
 

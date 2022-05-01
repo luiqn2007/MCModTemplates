@@ -2,20 +2,20 @@ package com.example.examplemod.woodwork;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MaterialColor;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -28,11 +28,10 @@ import java.util.function.Supplier;
  *
  * <p>Require textures:</p>
  * <ul>
- *     <li>Item: boat, door, sign</li>
+ *     <li>Item: door, sign</li>
  *     <li>Block: planks</li>
  *     <li>Door: assets.[modid].textures.block.[woodwork]_door_top.png</li>
  *     <li>Door: assets.[modid].textures.block.[woodwork]_door_botton.png</li>
- *     <li>Boat: assets.[modid].textures.entity.boat.[woodwork].png</li>
  *     <li>Sign: assets.[modid].textures.entity.signs.[woodwork].png</li>
  *     <li>Chest(normal):  assets.[modid].textures.entity.chest.[woodwork].png</li>
  *     <li>Chest(left):  assets.[modid].textures.entity.chest.[woodwork]_left.png</li>
@@ -46,14 +45,8 @@ import java.util.function.Supplier;
  */
 public class Woodwork {
 
-    public static WoodworkBuilder builder(ResourceLocation name) {
-        WoodworkManager.ensureInitialized();
+    public static WoodworkBuilder builder(String name) {
         return new WoodworkBuilder(name);
-    }
-
-    public static WoodworkBuilder builder(String modid, String name) {
-        WoodworkManager.ensureInitialized();
-        return new WoodworkBuilder(new ResourceLocation(modid, name));
     }
 
     // properties
@@ -74,29 +67,30 @@ public class Woodwork {
     public final RegistryObject<FenceGateBlock> fenceGate;
     public final RegistryObject<FenceBlock> fence;
     public final RegistryObject<DoorBlock> door;
-    @Nullable
-    public final RegistryObject<ChestBlock> chest;
-    @Nullable
-    public final RegistryObject<ChestBlock> trappedChest;
     private final Set<Block> allBlocks = new HashSet<>();
 
+    // block entities
+    @Nullable
+    public final RegistryObject<BlockEntityType<ModSignBlockEntity>> signEntity;
+    @Nullable
+    public final RegistryObject<BlockEntityType<ModSignBlockEntity>> wallSignEntity;
+
     // items
-    public final RegistryObject<BoatItem> boat;
     private final Set<Item> allItems = new HashSet<>();
     private final WoodworkRegisterHelper register = new WoodworkRegisterHelper(this);
 
-    @Nullable
-    Object boatLayer = null;
+    private final WoodworkManager manager;
 
-    Woodwork(WoodworkBuilder builder) {
+    Woodwork(WoodworkBuilder builder, WoodworkManager manager) {
+        this.manager = manager;
         this.plankColor = builder.plankColor;
-        this.name = builder.name;
+        this.name = new ResourceLocation(manager.modid(), builder.name);
         this.type = WoodType.register(WoodType.create(name.toString()));
         this.tab = builder.tab;
 
         this.planks = addBlock(builder.planks);
-        this.sign = addBlock(builder.sign, WoodworkManager.signBlocks);
-        this.wallSign = addBlock(builder.wallSign, false, WoodworkManager.signBlocks);
+        this.sign = addBlock(builder.sign);
+        this.wallSign = addBlock(builder.wallSign, false);
         this.pressurePlate = addBlock(builder.pressurePlate);
         this.trapdoor = addBlock(builder.trapdoor);
         this.stairs = addBlock(builder.stairs);
@@ -105,13 +99,14 @@ public class Woodwork {
         this.fenceGate = addBlock(builder.fenceGate);
         this.fence = addBlock(builder.fence);
         this.door = addBlock(builder.door);
-        this.chest = builder.chest.noBlock ? null : addBlock(builder.chest, WoodworkManager.chestBlocks);
-        this.trappedChest = builder.trappedChest.noBlock ? null : addBlock(builder.trappedChest, WoodworkManager.trappedChestBlocks);
-        this.boat = register(WoodworkManager.items(), "boat", () -> {
-            BoatItem item = builder.boat.apply(builder.boatProperties.apply(this), this);
-            allItems.add(item);
-            return item;
-        });
+
+        this.signEntity = addBlockEntity(builder.sign, () -> new BlockEntityType<>((p, s) ->
+                new ModSignBlockEntity(signEntity(), p, s), Set.of(sign()), null));
+        this.wallSignEntity = addBlockEntity(builder.wallSign, () -> new BlockEntityType<>((p, s) ->
+                new ModSignBlockEntity(wallSignEntity(), p, s), Set.of(wallSign()), null));
+
+        manager.byId.put(name, this);
+        manager.byType.put(type, this);
     }
 
     public ResourceLocation name() {
@@ -162,29 +157,20 @@ public class Woodwork {
         return door.get();
     }
 
-    public ChestBlock chest() {
-        return Objects.requireNonNull(chest).get();
+    public BlockEntityType<ModSignBlockEntity> signEntity() {
+        return Objects.requireNonNull(signEntity).get();
     }
 
-    public ChestBlock trappedChest() {
-        return Objects.requireNonNull(trappedChest).get();
+    public BlockEntityType<ModSignBlockEntity> wallSignEntity() {
+        return Objects.requireNonNull(wallSignEntity).get();
     }
 
-    public BoatItem boat() {
-        return boat.get();
+    public boolean useDefaultSignEntity() {
+        return signEntity != null;
     }
 
-    public boolean hasChest() {
-        return chest != null;
-    }
-
-    public boolean hasTrappedChest() {
-        return trappedChest != null;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public net.minecraft.client.model.geom.ModelLayerLocation boatLayer() {
-        return Objects.requireNonNull((net.minecraft.client.model.geom.ModelLayerLocation) boatLayer);
+    public boolean useDefaultWallSignEntity() {
+        return wallSignEntity != null;
     }
 
     public Set<Block> allBlocks() {
@@ -199,17 +185,18 @@ public class Woodwork {
         return register;
     }
 
-    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory, boolean hasItem, @Nullable Set<Block> entityBlocks) {
-        RegistryObject<B> block = register(WoodworkManager.blocks(), factory.name, () -> {
+    public WoodworkManager manager() {
+        return manager;
+    }
+
+    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem, ?> factory, boolean hasItem) {
+        RegistryObject<B> block = register(manager.blocks(), factory.name, () -> {
             B b = factory.newBlock(this);
             allBlocks.add(b);
-            if (entityBlocks != null && !factory.customEntity) {
-                entityBlocks.add(b);
-            }
             return b;
         });
         if (hasItem) {
-            register(WoodworkManager.items(), block, () -> {
+            register(manager.items(), block, () -> {
                 BlockItem i = factory.newItem(this);
                 allItems.add(i);
                 return i;
@@ -218,12 +205,13 @@ public class Woodwork {
         return block;
     }
 
-    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory) {
-        return addBlock(factory, true, null);
+    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem, ?> factory) {
+        return addBlock(factory, true);
     }
 
-    private <B extends Block> RegistryObject<B> addBlock(BlockFactory<B, ? extends BlockItem> factory, Set<Block> entityBlocks) {
-        return addBlock(factory, true, entityBlocks);
+    @Nullable
+    private <T extends BlockEntity> RegistryObject<BlockEntityType<T>> addBlockEntity(BlockFactory<?, ?, ?> factory, Supplier<BlockEntityType<T>> sup) {
+        return (factory.noBlock || factory.customEntity) ? null : register(manager.blockEntities(), factory.name, sup);
     }
 
     private <T extends IForgeRegistryEntry<? super T>> void register(DeferredRegister<? super T> register,

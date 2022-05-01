@@ -42,7 +42,7 @@ public class RegisteredBlockLoot extends BlockLoot {
         return this;
     }
 
-    public RegisteredBlockLoot skip(Supplier<Block> block) {
+    public RegisteredBlockLoot skip(Supplier<? extends Block> block) {
         skips.add(block.get());
         return this;
     }

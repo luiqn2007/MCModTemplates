@@ -40,10 +40,6 @@ public class ModSignBlockEntity extends BlockEntity implements IWoodworkEntity {
         super(pType, pWorldPosition, pBlockState);
     }
 
-    public ModSignBlockEntity(BlockPos pWorldPosition, BlockState pBlockState) {
-        super(WoodworkManager.signBlockEntityType(), pWorldPosition, pBlockState);
-    }
-
     private Component loadLine(String textJson) {
         Component component = this.deserializeTextSafe(textJson);
         if (this.level instanceof ServerLevel) {
@@ -214,5 +210,4 @@ public class ModSignBlockEntity extends BlockEntity implements IWoodworkEntity {
         this.renderMessages = null;
         this.hasGlowingText = pTag.getBoolean("GlowingText");
     }
-
 }

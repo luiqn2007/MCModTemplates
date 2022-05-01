@@ -2,9 +2,7 @@ package com.example.examplemod.test.datagen;
 
 import com.example.examplemod.datagen.ForDeferredRegister;
 import com.example.examplemod.datagen.WarnItemModelProvider;
-import com.example.examplemod.test.Registers;
-import com.example.examplemod.test.tree.TreeTest;
-import com.example.examplemod.test.woodwork.WoodworkTest;
+import com.example.examplemod.test.*;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
@@ -16,13 +14,23 @@ public class ItemModelProvider extends WarnItemModelProvider {
 
     @Override
     protected void registerModels() {
-        TreeTest.TREE.register().addItemModels(this);
-        WoodworkTest.WOODWORK_WITH_CHEST.register().addItemModels(this);
-        WoodworkTest.WOODWORK_WITHOUT_CHEST.register().addItemModels(this);
+        TestTree.TREE.register().addItemModels(this);
+        TestWoodwork.WOODWORK1.register().addItemModels(this);
+        TestWoodwork.WOODWORK2.register().addItemModels(this);
+        TestChest.CHEST1.get().register().addItemModels(this);
+        TestChest.TRAPPED_CHEST1.get().register().addItemModels(this);
+        TestChest.CHEST2.get().register().addItemModels(this);
+        TestChest.CHEST3.get().register().addItemModels(this);
+        TestBoat.BOAT.get().register().addItemModels(this);
         new ForDeferredRegister<>(Registers.ITEMS)
-                .skipAll(TreeTest.TREE.allItems())
-                .skipAll(WoodworkTest.WOODWORK_WITH_CHEST.allItems())
-                .skipAll(WoodworkTest.WOODWORK_WITHOUT_CHEST.allItems())
+                .skipAll(TestTree.TREE.allItems())
+                .skipAll(TestWoodwork.WOODWORK1.allItems())
+                .skipAll(TestWoodwork.WOODWORK2.allItems())
+                .skip(TestChest.CHEST1.get().asItem())
+                .skip(TestChest.TRAPPED_CHEST1.get().asItem())
+                .skip(TestChest.CHEST2.get().asItem())
+                .skip(TestChest.CHEST3.get().asItem())
+                .skip(TestBoat.BOAT)
                 .forDefault(this::block)
                 .addAll();
     }

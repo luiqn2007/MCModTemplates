@@ -1,6 +1,6 @@
 package com.example.examplemod.test.item.axe.stripping;
 
-import com.example.examplemod.test.ModTab;
+import com.example.examplemod.test.Registers;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -25,7 +25,7 @@ public class StripTest {
     }
 
     private static <T extends Block> RegistryObject<Item> defaultItem(RegistryObject<T> block) {
-        return ITEMS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Properties().tab(ModTab.INNSTANCE)));
+        return ITEMS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Properties().tab(Registers.TAB)));
     }
 
     public static void register() {
