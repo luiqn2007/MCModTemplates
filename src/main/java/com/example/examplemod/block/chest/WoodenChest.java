@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Require {@link com.example.examplemod.mixin.woodwork.MixinSheets}
+ * Require {@link com.example.examplemod.mixin.chest.MixinSheets}
  */
 public class WoodenChest extends ChestBlock {
 

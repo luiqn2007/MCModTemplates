@@ -1,4 +1,4 @@
-package com.example.examplemod.mixin.woodwork;
+package com.example.examplemod.mixin.chest;
 
 import com.example.examplemod.block.chest.WoodenChestRenderer;
 import net.minecraft.client.renderer.Sheets;

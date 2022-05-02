@@ -15,7 +15,6 @@ import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -23,7 +22,7 @@ import java.util.function.Supplier;
 /**
  * Woodwork, from planks to sign, trapdoor, button, fence, door, and other all vanilla wooden blocks and item(boat),
  *
- * <p>It need mixin {@link com.example.examplemod.mixin.woodwork.MixinSheets} to initialize chest texture
+ * <p>It need mixin {@link com.example.examplemod.mixin.chest.MixinSheets} to initialize chest texture
  * if the woodwork contains chest or trapped chest</p>
  *
  * <p>Require textures:</p>
