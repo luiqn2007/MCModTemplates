@@ -2,6 +2,7 @@ package com.example.examplemod.util;
 
 import net.minecraft.nbt.*;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -19,13 +20,14 @@ public final class OptionalTag<T extends Tag> {
 
     private static final OptionalTag<?> EMPTY = new OptionalTag<>(null);
 
+    @Nullable
     private final T value;
 
     public static <T extends Tag> OptionalTag<T> empty() {
         return (OptionalTag<T>) EMPTY;
     }
 
-    private OptionalTag(T value) {
+    private OptionalTag(@Nullable T value) {
         this.value = value;
     }
 
@@ -33,7 +35,7 @@ public final class OptionalTag<T extends Tag> {
         return new OptionalTag<>(Objects.requireNonNull(value));
     }
 
-    public static <T extends Tag> OptionalTag<T> ofNullable(T value) {
+    public static <T extends Tag> OptionalTag<T> ofNullable(@Nullable T value) {
         return value == null ? (OptionalTag<T>) EMPTY : new OptionalTag<>(value);
     }
 
@@ -360,6 +362,97 @@ public final class OptionalTag<T extends Tag> {
 
     public boolean containsUUID(String name) {
         return value instanceof CompoundTag tag && tag.hasUUID(name);
+    }
+
+    public OptionalTag<CompoundTag> put(String name, Tag value) {
+        OptionalTag<CompoundTag> optionalTag = asCompound();
+        optionalTag.ifPresent(tag -> tag.put(name, value));
+        return optionalTag;
+    }
+
+    public OptionalTag<CompoundTag> put(String name, byte value) {
+        return put(name, ByteTag.valueOf(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, short value) {
+        return put(name, ShortTag.valueOf(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, int value) {
+        return put(name, IntTag.valueOf(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, long value) {
+        return put(name, LongTag.valueOf(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, float value) {
+        return put(name, FloatTag.valueOf(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, double value) {
+        return put(name, DoubleTag.valueOf(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, byte[] value) {
+        return put(name, (Tag) new ByteArrayTag(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, String value) {
+        return put(name, StringTag.valueOf(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, List<? extends Tag> value) {
+        if (value instanceof Tag tag) {
+            return put(name, tag);
+        } else {
+            return put(name, (Tag) value.stream().collect(ListTag::new, ListTag::add, AbstractCollection::addAll));
+        }
+    }
+
+    public OptionalTag<CompoundTag> put(String name, Map<String, ? extends Tag> value) {
+        CompoundTag tag = new CompoundTag();
+        value.forEach(tag::put);
+        return put(name, tag);
+    }
+
+    public OptionalTag<CompoundTag> put(String name, int[] value) {
+        return put(name, (Tag) new IntArrayTag(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, long[] value) {
+        return put(name, (Tag) new LongArrayTag(value));
+    }
+
+    public OptionalTag<CompoundTag> computeIfAbsent(String name, Function<String, Tag> factory) {
+        OptionalTag<CompoundTag> compound = asCompound();
+        compound.ifPresent(tag -> {
+            if (!tag.contains(name)) {
+                tag.put(name, factory.apply(name));
+            }
+        });
+        return compound;
+    }
+
+    public OptionalTag<CompoundTag> computeIfAbsent(String name, Supplier<Tag> factory) {
+        return computeIfAbsent(name, __ -> factory.get());
+    }
+
+    public <U extends Tag> OptionalTag<U> computeIfAbsent(String name, int type, Function<String, U> factory) {
+        if (value instanceof CompoundTag tag) {
+            if (tag.contains(name, type)) {
+                return ofNullable((U) tag.get(name));
+            } else {
+                U apply = factory.apply(name);
+                tag.put(name, apply);
+                return of(apply);
+            }
+        }
+        return empty();
+    }
+
+    public <U extends Tag> OptionalTag<U> computeIfAbsent(String name, int type, Supplier<U> factory) {
+        return computeIfAbsent(name, type, __ -> factory.get());
     }
 
     // List ============================================================================================================
