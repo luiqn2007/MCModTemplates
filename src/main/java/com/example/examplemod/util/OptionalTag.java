@@ -5,10 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static net.minecraft.nbt.Tag.*;
@@ -368,9 +365,9 @@ public final class OptionalTag<T extends Tag> {
         return value instanceof CompoundTag tag && tag.hasUUID(name);
     }
 
-    public OptionalTag<CompoundTag> put(String name, Tag value) {
+    public OptionalTag<CompoundTag> put(String name, @Nullable Tag value) {
         OptionalTag<CompoundTag> optionalTag = asCompound();
-        optionalTag.ifPresent(tag -> tag.put(name, value));
+        if (value != null) optionalTag.ifPresent(tag -> tag.put(name, value));
         return optionalTag;
     }
 
@@ -426,6 +423,18 @@ public final class OptionalTag<T extends Tag> {
 
     public OptionalTag<CompoundTag> put(String name, long[] value) {
         return put(name, (Tag) new LongArrayTag(value));
+    }
+
+    public OptionalTag<CompoundTag> put(String name, @Nullable UUID value) {
+        OptionalTag<CompoundTag> optionalTag = asCompound();
+        if (value != null) optionalTag.ifPresent(tag -> tag.putUUID(name, value));
+        return optionalTag;
+    }
+
+    public <U> OptionalTag<CompoundTag> put(@Nullable U value, BiConsumer<U, CompoundTag> serializer) {
+        OptionalTag<CompoundTag> optionalTag = asCompound();
+        if (value != null) optionalTag.ifPresent(tag -> serializer.accept(value, tag));
+        return optionalTag;
     }
 
     public OptionalTag<CompoundTag> computeIfAbsent(String name, Function<String, Tag> factory) {
