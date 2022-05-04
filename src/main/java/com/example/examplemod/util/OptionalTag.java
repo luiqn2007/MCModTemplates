@@ -437,6 +437,17 @@ public final class OptionalTag<T extends Tag> {
         return optionalTag;
     }
 
+    public <U> OptionalTag<CompoundTag> put(String name, @Nullable U value, Function<U, Tag> serializer) {
+        OptionalTag<CompoundTag> optionalTag = asCompound();
+        if (value != null) {
+            Tag tag = serializer.apply(value);
+            if (tag != null) {
+                return optionalTag.put(name, tag);
+            }
+        }
+        return optionalTag;
+    }
+
     public OptionalTag<CompoundTag> computeIfAbsent(String name, Function<String, Tag> factory) {
         OptionalTag<CompoundTag> compound = asCompound();
         compound.ifPresent(tag -> {
