@@ -234,6 +234,10 @@ public final class OptionalTag<T extends Tag> {
         return is(TAG_LONG_ARRAY);
     }
 
+    public <U> Optional<U> mapToObj(Function<T, U> map) {
+        return value == null ? Optional.empty() : Optional.ofNullable(map.apply(value));
+    }
+
     // CompoundTag =====================================================================================================
 
     public OptionalTag<Tag> get(String name) {
