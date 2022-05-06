@@ -2,9 +2,11 @@ package com.example.examplemod.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -62,6 +64,34 @@ public class CrossBlocks {
 
     public boolean is(Direction direction, int n, Block block) {
         return get(direction, n).is(block);
+    }
+
+    public boolean is(Direction direction, int n, Fluid fluid) {
+        return get(direction, n).getFluidState().is(fluid);
+    }
+
+    public boolean is(Direction direction, int n, TagKey<Fluid> fluid) {
+        return get(direction, n).getFluidState().is(fluid);
+    }
+
+    public boolean isDry(Direction direction) {
+        return get(direction).getFluidState().isEmpty();
+    }
+
+    public boolean isDry(Direction direction, int n) {
+        return get(direction, n).getFluidState().isEmpty();
+    }
+
+    public boolean isSource(Direction direction, int n) {
+        return get(direction, n).getFluidState().isSource();
+    }
+
+    public boolean isSource(Direction direction, int n, Fluid fluid) {
+        return is(direction, n, fluid) && isSource(direction, n);
+    }
+
+    public boolean isSource(Direction direction, int n, TagKey<Fluid> fluid) {
+        return is(direction, n, fluid) && isSource(direction, n);
     }
 
     public int nearby(Block block) {
