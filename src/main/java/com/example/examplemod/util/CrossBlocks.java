@@ -66,6 +66,14 @@ public class CrossBlocks {
         return get(direction, n).is(block);
     }
 
+    public boolean is(Direction direction, Fluid fluid) {
+        return get(direction).getFluidState().is(fluid);
+    }
+
+    public boolean is(Direction direction, TagKey<Fluid> fluid) {
+        return get(direction).getFluidState().is(fluid);
+    }
+
     public boolean is(Direction direction, int n, Fluid fluid) {
         return get(direction, n).getFluidState().is(fluid);
     }
@@ -80,6 +88,18 @@ public class CrossBlocks {
 
     public boolean isDry(Direction direction, int n) {
         return get(direction, n).getFluidState().isEmpty();
+    }
+
+    public boolean isSource(Direction direction) {
+        return get(direction).getFluidState().isSource();
+    }
+
+    public boolean isSource(Direction direction, Fluid fluid) {
+        return is(direction, fluid) && isSource(direction);
+    }
+
+    public boolean isSource(Direction direction, TagKey<Fluid> fluid) {
+        return is(direction, fluid) && isSource(direction);
     }
 
     public boolean isSource(Direction direction, int n) {
