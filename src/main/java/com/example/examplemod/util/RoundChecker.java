@@ -2,8 +2,10 @@ package com.example.examplemod.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -16,11 +18,11 @@ import java.util.function.Supplier;
 
 public class RoundChecker {
 
-    private final BlockAndTintGetter level;
-    private final BlockPos pos;
+    private final BlockGetter level;
+    private BlockPos pos;
     private final Map<BlockPos, BlockState> bs = new HashMap<>();
 
-    public RoundChecker(BlockAndTintGetter level, BlockPos pos) {
+    public RoundChecker(BlockGetter level, BlockPos pos) {
         this.level = level;
         this.pos = pos;
     }
@@ -46,6 +48,34 @@ public class RoundChecker {
     public BlockPos at(int y) {
         return pos.atY(y);
     }
+    public BlockPos here() {
+        return pos;
+    }
+
+    public void move(Direction direction) {
+        set(relative(direction));
+    }
+    public void move(Direction direction, int distance) {
+        set(relative(direction, distance));
+    }
+    public void move(int x, int y, int z) {
+        set(relative(x, y, z));
+    }
+    public void move(int x, int z) {
+        set(relative(x, z));
+    }
+    public void move(int y) {
+        set(relative(y));
+    }
+    public void set(int x, int z) {
+        set(at(x, z));
+    }
+    public void set(int y) {
+        set(at(y));
+    }
+    public void set(BlockPos p) {
+        pos = p;
+    }
 
     public BlockState block(BlockPos pos) {
         return bs.computeIfAbsent(pos, level::getBlockState);
@@ -54,7 +84,7 @@ public class RoundChecker {
         return block(pos).getFluidState();
     }
     public int light(BlockPos pos) {
-        return level.getRawBrightness(pos, 0);
+        return level instanceof BlockAndTintGetter t ? t.getRawBrightness(pos, 0) : -1;
     }
 
     public boolean is(Direction direction, Block block) {
@@ -132,6 +162,90 @@ public class RoundChecker {
         return block(p).is(block.get());
     }
 
+    public boolean near(Direction direction, Block block) {
+        return nearAt(relative(direction), block);
+    }
+    public boolean near(Direction direction, int distance, Block block) {
+        return nearAt(relative(direction, distance), block);
+    }
+    public boolean near(int x, int y, int z, Block block) {
+        return nearAt(relative(x, y, z), block);
+    }
+    public boolean near(int x, int z, Block block) {
+        return nearAt(relative(x, z), block);
+    }
+    public boolean near(int y, Block block) {
+        return nearAt(relative(y), block);
+    }
+    public boolean nearAt(int x, int z, Block block) {
+        return nearAt(at(x, z), block);
+    }
+    public boolean nearAt(int y, Block block) {
+        return nearAt(at(y), block);
+    }
+    public boolean nearAt(BlockPos p, Block block) {
+        for (Direction value : Direction.values()) {
+            if (block(p.relative(value)).is(block)) return true;
+        }
+        return false;
+    }
+
+    public boolean near(Direction direction, TagKey<Block> block) {
+        return nearAt(relative(direction), block);
+    }
+    public boolean near(Direction direction, int distance, TagKey<Block> block) {
+        return nearAt(relative(direction, distance), block);
+    }
+    public boolean near(int x, int y, int z, TagKey<Block> block) {
+        return nearAt(relative(x, y, z), block);
+    }
+    public boolean near(int x, int z, TagKey<Block> block) {
+        return nearAt(relative(x, z), block);
+    }
+    public boolean near(int y, TagKey<Block> block) {
+        return nearAt(relative(y), block);
+    }
+    public boolean nearAt(int x, int z, TagKey<Block> block) {
+        return nearAt(at(x, z), block);
+    }
+    public boolean nearAt(int y, TagKey<Block> block) {
+        return nearAt(at(y), block);
+    }
+    public boolean nearAt(BlockPos p, TagKey<Block> block) {
+        for (Direction value : Direction.values()) {
+            if (block(p.relative(value)).is(block)) return true;
+        }
+        return false;
+    }
+
+    public boolean near(Direction direction, Supplier<? extends Block> block) {
+        return nearAt(relative(direction), block);
+    }
+    public boolean near(Direction direction, int distance, Supplier<? extends Block> block) {
+        return nearAt(relative(direction, distance), block);
+    }
+    public boolean near(int x, int y, int z, Supplier<? extends Block> block) {
+        return nearAt(relative(x, y, z), block);
+    }
+    public boolean near(int x, int z, Supplier<? extends Block> block) {
+        return nearAt(relative(x, z), block);
+    }
+    public boolean near(int y, Supplier<? extends Block> block) {
+        return nearAt(relative(y), block);
+    }
+    public boolean nearAt(int x, int z, Supplier<? extends Block> block) {
+        return nearAt(at(x, z), block);
+    }
+    public boolean nearAt(int y, Supplier<? extends Block> block) {
+        return nearAt(at(y), block);
+    }
+    public boolean nearAt(BlockPos p, Supplier<? extends Block> block) {
+        for (Direction value : Direction.values()) {
+            if (block(p.relative(value)).is(block.get())) return true;
+        }
+        return false;
+    }
+
     public boolean isAir(Direction direction) {
         return isAirAt(relative(direction));
     }
@@ -155,6 +269,31 @@ public class RoundChecker {
     }
     public boolean isAirAt(BlockPos p) {
         return block(p).isAir();
+    }
+
+    public boolean isReplaceable(Direction direction) {
+        return isReplaceableAt(relative(direction));
+    }
+    public boolean isReplaceable(Direction direction, int distance) {
+        return isReplaceableAt(relative(direction, distance));
+    }
+    public boolean isReplaceable(int x, int y, int z) {
+        return isReplaceableAt(relative(x, y, z));
+    }
+    public boolean isReplaceable(int x, int z) {
+        return isReplaceableAt(relative(x, z));
+    }
+    public boolean isReplaceable(int y) {
+        return isReplaceableAt(relative(y));
+    }
+    public boolean isReplaceableAt(int x, int z) {
+        return isReplaceableAt(at(x, z));
+    }
+    public boolean isReplaceableAt(int y) {
+        return isReplaceableAt(at(y));
+    }
+    public boolean isReplaceableAt(BlockPos p) {
+        return block(p).is(BlockTags.REPLACEABLE_PLANTS);
     }
 
     public boolean isBurning(Direction direction) {
@@ -310,6 +449,56 @@ public class RoundChecker {
         return fluid(p).is(fluid);
     }
 
+    public boolean isSource(Direction direction) {
+        return isSourceAt(relative(direction));
+    }
+    public boolean isSource(Direction direction, int distance) {
+        return isSourceAt(relative(direction, distance));
+    }
+    public boolean isSource(int x, int y, int z) {
+        return isSourceAt(relative(x, y, z));
+    }
+    public boolean isSource(int x, int z) {
+        return isSourceAt(relative(x, z));
+    }
+    public boolean isSource(int y) {
+        return isSourceAt(relative(y));
+    }
+    public boolean isSourceAt(int x, int z) {
+        return isSourceAt(at(x, z));
+    }
+    public boolean isSourceAt(int y) {
+        return isSourceAt(at(y));
+    }
+    public boolean isSourceAt(BlockPos p) {
+        return fluid(p).isSource();
+    }
+
+    public boolean isDry(Direction direction) {
+        return isDryAt(relative(direction));
+    }
+    public boolean isDry(Direction direction, int distance) {
+        return isDryAt(relative(direction, distance));
+    }
+    public boolean isDry(int x, int y, int z) {
+        return isDryAt(relative(x, y, z));
+    }
+    public boolean isDry(int x, int z) {
+        return isDryAt(relative(x, z));
+    }
+    public boolean isDry(int y) {
+        return isDryAt(relative(y));
+    }
+    public boolean isDryAt(int x, int z) {
+        return isDryAt(at(x, z));
+    }
+    public boolean isDryAt(int y) {
+        return isDryAt(at(y));
+    }
+    public boolean isDryAt(BlockPos p) {
+        return fluid(p).isEmpty();
+    }
+
     public boolean has(Direction direction, Supplier<? extends Fluid> fluid) {
         return hasAt(relative(direction), fluid);
     }
@@ -357,7 +546,7 @@ public class RoundChecker {
         return isAt(at(y), light);
     }
     public boolean isAt(BlockPos p, int light) {
-        return level.getRawBrightness(p, 0) == light;
+        return light(p) == light;
     }
 
     public boolean light(Direction direction, int min) {
@@ -382,32 +571,32 @@ public class RoundChecker {
         return lightAt(at(y), min);
     }
     public boolean lightAt(BlockPos p, int min) {
-        return level.getRawBrightness(p, 0) >= min;
+        return light(p) >= min;
     }
 
-    public boolean dark(Direction direction, int min) {
-        return darkAt(relative(direction), min);
+    public boolean dark(Direction direction, int max) {
+        return darkAt(relative(direction), max);
     }
-    public boolean dark(Direction direction, int distance, int min) {
-        return darkAt(relative(direction, distance), min);
+    public boolean dark(Direction direction, int distance, int max) {
+        return darkAt(relative(direction, distance), max);
     }
-    public boolean dark(int x, int y, int z, int min) {
-        return darkAt(relative(x, y, z), min);
+    public boolean dark(int x, int y, int z, int max) {
+        return darkAt(relative(x, y, z), max);
     }
-    public boolean dark(int x, int z, int min) {
-        return darkAt(relative(x, z), min);
+    public boolean dark(int x, int z, int max) {
+        return darkAt(relative(x, z), max);
     }
-    public boolean dark(int y, int min) {
-        return darkAt(relative(y), min);
+    public boolean dark(int y, int max) {
+        return darkAt(relative(y), max);
     }
-    public boolean darkAt(int x, int z, int min) {
-        return darkAt(at(x, z), min);
+    public boolean darkAt(int x, int z, int max) {
+        return darkAt(at(x, z), max);
     }
-    public boolean darkAt(int y, int min) {
-        return darkAt(at(y), min);
+    public boolean darkAt(int y, int max) {
+        return darkAt(at(y), max);
     }
-    public boolean darkAt(BlockPos p, int min) {
-        return level.getRawBrightness(p, 0) <= min;
+    public boolean darkAt(BlockPos p, int max) {
+        return light(p) <= max;
     }
 
     public void clear() {
