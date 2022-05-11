@@ -2,7 +2,6 @@ package com.example.examplemod.test.datagen;
 
 import com.example.examplemod.datagen.LanguageProviderZhEn;
 import com.example.examplemod.test.*;
-import com.example.examplemod.test.item.axe.stripping.StripTest;
 import net.minecraft.data.DataGenerator;
 
 public class LanguageProvider extends LanguageProviderZhEn {
@@ -14,9 +13,6 @@ public class LanguageProvider extends LanguageProviderZhEn {
     @Override
     protected void addTranslations() {
         addGroup(Registers.TAB, "Template Examples", "模板测试");
-        // item/axe/stripping
-        addBlock(StripTest.BLOCK_M_BASE, "[STRIP][MIXIN]Base", "[STRIP][MIXIN]起始");
-        addBlock(StripTest.BLOCK_M_STRIPPED, "[STRIP][MIXIN]Stripped", "[STRIP][MIXIN]剥皮");
     }
 
     @Override

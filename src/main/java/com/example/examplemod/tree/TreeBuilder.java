@@ -7,13 +7,17 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.grower.OakTreeGrower;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +51,16 @@ public class TreeBuilder {
                     ? tree.properties().topLogColor()
                     : tree.properties().barkLogColor())
             .strength(2.0F)
-            .sound(SoundType.WOOD));
+            .sound(SoundType.WOOD)) {
+        @Nullable
+        @Override
+        public BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
+            if (ToolActions.AXE_STRIP.equals(toolAction)) {
+                return tree.strippedLog().defaultBlockState();
+            }
+            return super.getToolModifiedState(state, context, toolAction, simulate);
+        }
+    };
     Function<Tree, BlockItem> logItem = tree -> new BlockItem(tree.log(), new Item.Properties().tab(tree.properties().tab()));
 
     Function<Tree, RotatedPillarBlock> strippedLog = tree -> new RotatedPillarBlock(BlockBehaviour.Properties
@@ -61,7 +74,16 @@ public class TreeBuilder {
     Function<Tree, RotatedPillarBlock> wood = tree -> new RotatedPillarBlock(BlockBehaviour.Properties
             .of(Material.WOOD, tree.properties().woodColor())
             .strength(2.0F)
-            .sound(SoundType.WOOD));
+            .sound(SoundType.WOOD)) {
+        @Nullable
+        @Override
+        public BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
+            if (ToolActions.AXE_STRIP.equals(toolAction)) {
+                return tree.strippedWoods().defaultBlockState();
+            }
+            return super.getToolModifiedState(state, context, toolAction, simulate);
+        }
+    };
     Function<Tree, BlockItem> woodItem = tree -> new BlockItem(tree.wood(), new Item.Properties().tab(tree.properties().tab()));
 
     Function<Tree, RotatedPillarBlock> strippedWoods = tree -> new RotatedPillarBlock(BlockBehaviour.Properties

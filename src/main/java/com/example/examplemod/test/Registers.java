@@ -2,7 +2,6 @@ package com.example.examplemod.test;
 
 import com.example.examplemod.ExampleMod;
 import com.example.examplemod.command.CommandRegister;
-import com.example.examplemod.test.item.axe.stripping.StripTest;
 import com.example.examplemod.woodwork.NetworkHolder;
 import com.example.examplemod.woodwork.WoodworkManager;
 import net.minecraft.resources.ResourceLocation;
@@ -47,7 +46,6 @@ public class Registers {
         COMMANDS.register();
 
         TestCommand.register();
-        StripTest.register();
         TestTree.register(bus);
         TestWoodwork.register(bus);
         TestChest.register(bus);

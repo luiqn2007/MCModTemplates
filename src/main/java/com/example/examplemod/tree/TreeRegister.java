@@ -24,7 +24,6 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.LanguageProvider;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -52,14 +51,6 @@ public record TreeRegister(Tree tree) {
         net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(tree.leaves(), cutoutMipped);
         net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(tree.sapling(), cutout);
         net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(tree.pottedSapling(), cutout);
-    }
-
-    /**
-     * add stripped recipe for axe, call after {@link RegistryEvent} event
-     */
-    public void addAxeStripped(BiConsumer<Block, Block> register) {
-        register.accept(tree.log(), tree.strippedLog());
-        register.accept(tree.wood(), tree.strippedWoods());
     }
 
     /**
