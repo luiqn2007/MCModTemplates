@@ -55,25 +55,51 @@ public class Functions {
 
     public static <T, P1> Supplier<T> constructor(Class<? extends T> aClass, Class<P1> p1, Supplier<P1> sup) {
         try {
-            Constructor<? extends T> c0 = aClass.getConstructor();
+            Constructor<? extends T> c1 = aClass.getConstructor(p1);
             return () -> {
                 try {
-                    return c0.newInstance();
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    throw new IllegalArgumentException("Can't create " + aClass.getCanonicalName() + " by no-parameter public constructor.", e);
+                    return c1.newInstance(sup.get());
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException ex) {
+                    throw new IllegalArgumentException("Can't create " + aClass.getCanonicalName() + " by public constructor with " + p1.getName(), ex);
                 }
             };
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException ex) {
             try {
-                Constructor<? extends T> c1 = aClass.getConstructor(p1);
+                Constructor<? extends T> c0 = aClass.getConstructor();
                 return () -> {
                     try {
-                        return c1.newInstance(sup.get());
-                    } catch (InvocationTargetException | InstantiationException | IllegalAccessException ex) {
-                        throw new IllegalArgumentException("Can't create " + aClass.getCanonicalName() + " by public constructor with " + p1.getName(), ex);
+                        return c0.newInstance();
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        throw new IllegalArgumentException("Can't create " + aClass.getCanonicalName() + " by no-parameter public constructor.", e);
                     }
                 };
-            } catch (NoSuchMethodException ex) {
+            } catch (NoSuchMethodException e) {
+                throw new IllegalArgumentException("Can't find constructor with no-parameter or " + p1.getName(), ex);
+            }
+        }
+    }
+
+    public static <T, P1> Function<P1, T> constructor(Class<? extends T> aClass, Class<P1> p1) {
+        try {
+            Constructor<? extends T> c1 = aClass.getConstructor(p1);
+            return p -> {
+                try {
+                    return c1.newInstance(p);
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException ex) {
+                    throw new IllegalArgumentException("Can't create " + aClass.getCanonicalName() + " by public constructor with " + p1.getName(), ex);
+                }
+            };
+        } catch (NoSuchMethodException ex) {
+            try {
+                Constructor<? extends T> c0 = aClass.getConstructor();
+                return p -> {
+                    try {
+                        return c0.newInstance();
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        throw new IllegalArgumentException("Can't create " + aClass.getCanonicalName() + " by no-parameter public constructor.", e);
+                    }
+                };
+            } catch (NoSuchMethodException e) {
                 throw new IllegalArgumentException("Can't find constructor with no-parameter or " + p1.getName(), ex);
             }
         }
