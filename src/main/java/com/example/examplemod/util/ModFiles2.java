@@ -10,12 +10,17 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
  * A class to get classes jar or directory.
  */
-public record ModFiles(Path root, FileSystem fs) {
+public record ModFiles2(Path root, FileSystem fs) {
+
+    private static final Map<String, ModFiles2> CACHE_BY_ID = new HashMap<>();
+    private static final Map<URI, ModFiles2> CACHE_BY_URI = new HashMap<>();
 
     // forge "union" scheme
     private static final FileSystemProvider UFSP = FileSystemProvider.installedProviders().stream()
@@ -30,8 +35,13 @@ public record ModFiles(Path root, FileSystem fs) {
      *                              RFC2396 and cannot be converted to a URI.
      * @throws NullPointerException if this modid is not loaded.
      */
-    public static ModFiles getFiles(String modid) throws URISyntaxException {
-        return getFiles(ModList.get().getModObjectById(modid).orElseThrow().getClass());
+    public static ModFiles2 getFiles(String modid) throws URISyntaxException {
+        if (CACHE_BY_ID.containsKey(modid)) {
+            return CACHE_BY_ID.get(modid);
+        }
+        ModFiles2 files = getFiles(ModList.get().getModObjectById(modid).orElseThrow().getClass());
+        CACHE_BY_ID.put(modid, files);
+        return files;
     }
 
     /**
@@ -43,15 +53,20 @@ public record ModFiles(Path root, FileSystem fs) {
      *                              RFC2396 and cannot be converted to a URI.
      * @throws NullPointerException if this modid is not loaded.
      */
-    public static ModFiles getFiles(Class<?> anyClass) throws URISyntaxException {
+    public static ModFiles2 getFiles(Class<?> anyClass) throws URISyntaxException {
         URI uri = anyClass.getProtectionDomain().getCodeSource().getLocation().toURI();
+        if (CACHE_BY_URI.containsKey(uri)) {
+            return CACHE_BY_URI.get(uri);
+        }
         FileSystem fs;
         if ("file".equalsIgnoreCase(uri.getScheme())) {
             fs = FileSystems.getFileSystem(uri);
         } else {
             fs = UFSP.getFileSystem(uri);
         }
-        return new ModFiles(fs.getPath("/"), fs);
+        ModFiles2 files = new ModFiles2(fs.getPath("/"), fs);
+        CACHE_BY_URI.put(uri, files);
+        return files;
     }
 
     /**
